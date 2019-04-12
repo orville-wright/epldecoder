@@ -201,7 +201,7 @@ class fpl_bootstrap:
 
 ########################################################
 # This is not a CLASS yet
-# but... I think this can be deleted? - depricated by which class?
+# but... can be deleted? - depricated by which class?
 # fpl_myteam_get is no longer called by any code.
 #
 # API request of detailed player team info, stats & data
@@ -210,8 +210,7 @@ class fpl_bootstrap:
 #     - inserted into the MongoDB collection
 #     - Printed in a nice human readable non-JSON format
 #
-# SHould be easy to convert to a CLASS, as it only takes playerid as input data
-#
+# takes playerid as input data
 
 def fpl_myteam_get(player_idnum):
     # API calls agaist the bootstrap url (..premierleague.com/drf/...) dont require any authentication, for any valid player id
