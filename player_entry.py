@@ -1,0 +1,92 @@
+#!/usr/bin/python3
+
+############################################
+# todo: add a method that prints a list of every league this player
+#       is enrolled in. Since its only held in the ENTRY data struct.
+#
+class player_entry:
+    """Base class for an OPPONENT (you/anyone) and your base EPL game ENTRY data set"""
+    """This works for any valid EPL player/opponent ID in the league"""
+    """but can only acesses the public data set (i.e. not current squad info)"""
+
+    def __init__(self, playeridnum):
+        self.playeridnum = str(playeridnum)
+        logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
+        EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum
+
+        s = requests.Session()
+        rx = s.get(EXTRACT_URL)    # basic non-authenticated API request on a player ENTRY
+        self.player_exists = rx.status_code
+        logging.info('player_entry:: - API url: %s' % rx.url )
+
+        if rx.status_code != 200:    # failed to access public URL for player number
+            logging.info('player_entry:: - ERROR GET failed for player %s' % self.playeridnum )
+            logging.info('player_entry:: - ERROR GET response code is %s' % self.player_exists )
+            return
+        else:
+            # create JSON dict with players ENTRY data, plus other data thats now available
+            logging.info('player_entry:: - init API GET response code was %s' % self.player_exists )
+            s2 = json.loads(rx.text)
+            self.entry = s2['entry']
+            self.leagues = s2['leagues']
+            self.cleagues = self.leagues['classic']
+            self.h2hleagues = self.leagues['h2h']
+            self.cupleagues = self.leagues['cup']
+            self.current_event = self.entry['current_event']
+        return
+
+    def my_name(self):
+        """Get the real human readable first/last name of this person"""
+        """Based on the EPL game ENTRY ID number"""
+
+        logging.info('player_entry:: my_name() - Init method' )
+        #print ( self.entry['player_first_name'], self.entry['player_last_name'], end="" )
+        return self.entry['player_first_name'] + " " + self.entry['player_last_name']
+
+    def my_id(self):
+        """Get the EPL game ENTRY ID of me"""
+
+        logging.info( 'player_entry:: my_id() - Init method' )
+        #print ( self.entry['id'], end="" )
+        return  self.entry['id']
+
+    def my_teamname(self):
+        """Get the name of my team"""
+
+        logging.info( 'player_entry:: my_teamname() - Init method' )
+        #print ( self.entry['name'], end="" )
+        return self.entry['name']
+
+    def my_entry_cleagues(self):    # list of all CLASSIC leagues player is entered in
+        """Cycle thru all my Classic Leagues & print them"""
+        """This will not access/print GLOBAL leagues (e.g. EPL Team leagues, Country leagues etc)"""
+
+        logging.info('player_entry:: my_entry_cleagues(): - Init method. scan league: %s' % this_league )
+        #print ( "Team name: %s" % self.entry['name'] )
+        #print (self.entry['name'], "plays in %s leagues" % len(self.cleagues))
+        p = 1
+        for v in self.cleagues:
+            print ("", p, "League ID: %s %s - I am ranked: %s" % (v['id'], v['name'], v['entry_rank']))
+            p += 1
+        return
+
+    def entry_insertdb(self):
+        """Insert game player ENTRY data into MongoDB"""
+
+        logging.info( 'player_entry:: entry_insertdb(): - Init method. MongoDB col insert: eplentry' )
+        mclient = MongoClient("mongodb://admin:sanfran1@localhost/admin")
+        db = mclient.test1
+        col = db.eplentry    # mongoDB collection
+
+        self.entry['kit'] = 'DATA_SANITIZED'           # delete kit element. its a messy uneeded embeded compound sub-doc data set
+        r = col.insert( { 'entry': self.entry } )      # insert ENTRY record into DB in 1 operation. (a compound doc)
+
+        # todo: restructure this insert into a nice vanilla row (not a compound doc)
+        # now load the DB with this teams squad details...
+        # which can only be done if we know what EVENT week ID we are currently in
+
+        #opponent_id = self.entry['id']
+        #event_id = self.entry['current_event']
+        print (" ")
+
+        return
