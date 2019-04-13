@@ -1,4 +1,22 @@
 #!/usr/bin/python3
+import requests
+from requests import Request, Session
+import json
+import logging
+
+FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+BST = "bootstrap"
+BSS = "bootstrap-static"
+BSD = "bootstrap-dynamic"
+MYTEAM = "my-team/"
+ENTRY = "entry/"
+USER_SUMMARY_SUBURL = "element-summary/"
+LCS_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+PLAYERS_INFO_SUBURL = "bootstrap-static"
+PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
+STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ######################
 # Class that gives better control and visibility into league details for a specific player
@@ -165,7 +183,7 @@ class league_details:
                 print ( "\tRank:", p['rank'], "Team ID:", p['id'], "-", p['entry_name'], "(", p['player_name'], ") -", p['event_total'] )
         return
 
-    def allmy_cl_lboard(self):    # list of CLASSIC leagues player is entered in
+    def allmy_cl_lboard(self, this_league):    # list of CLASSIC leagues player is entered in
         # this method sets-up the global class var/dict fofr iterating
         """ cycle thru a list of all my leagues & prints them """
         """ Also populates an class global vaariable/dict (self.cl_op_list) with same info """

@@ -1,4 +1,26 @@
 #!/usr/bin/python3
+import requests
+from requests import Request, Session
+from requests.auth import HTTPBasicAuth
+from requests.auth import HTTPDigestAuth
+import json
+import logging
+
+########################################
+
+FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+BST = "bootstrap"
+BSS = "bootstrap-static"
+BSD = "bootstrap-dynamic"
+MYTEAM = "my-team/"
+ENTRY = "entry/"
+USER_SUMMARY_SUBURL = "element-summary/"
+LCS_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+PLAYERS_INFO_SUBURL = "bootstrap-static"
+PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
+STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ############################################
 #
@@ -11,13 +33,16 @@ class priv_playerinfo:
     password = ""
     auth_status = ""
     api_get_status = ""
+    bst_inst = ""
 
-    def __init__(self, playeridnum, username, password):
+    def __init__(self, playeridnum, username, password, bootstrap):
         self.playeridnum = str(playeridnum)
         self.username = str(username)
         self.password = str(password)
+        self.bst_inst = bootstrap
         priv_playerinfo.username = self.username
         priv_playerinfo.password = self.password
+        priv_playerinfo.bst_inst = self.bst_inst
 
         logging.info('priv_playerinfo:: init class instance for player: %s' % self.playeridnum )
         pp_req = requests.Session()
@@ -125,6 +150,8 @@ class priv_playerinfo:
 
     def list_mysquad(self):
         """Print details about the players in my current squad"""
+        # self.bst_inst = bootstrap              # insert core bootstrap database instance ref into parent class attributre
+        # priv_bootstrap = self.bst_inst
 
         logging.info('priv_playerinfo:: list_mysquad() - Analyzing captain for team %s' % self.playeridnum )
         squad = []                            # temp working []
@@ -143,8 +170,8 @@ class priv_playerinfo:
                player_type = "Regular player"
 
             find_me = squad['element']
-            player_name = bootstrap.whois_element(find_me)            # global handle set once @ start
-            self.gw_points = bootstrap.element_gw_points(find_me)
+            player_name = self.bst_inst.whois_element(find_me)            # global handle set once @ start
+            self.gw_points = self.bst_inst.element_gw_points(find_me)
             print ( player_name, "(", end="" )
             print ( squad['element'], end="" )
             print ( ") - @ pos:", squad['position'], \
@@ -166,7 +193,7 @@ class priv_playerinfo:
             capt_list = self.picks[ca]
             if capt_list['is_captain'] is True:
                 find_me = capt_list['element']
-                player_name = bootstrap.whois_element(find_me)
+                player_name = self.bst_inst.whois_element(find_me)
                 print ( "My captain is:", capt_list['element'], player_name )
                 logging.info('priv_playerinfo:: capt_anlytx() - quick exit after %s loops' % ca )
                 return    # as soon as you find your captain, exit since there can only be 1

@@ -1,4 +1,22 @@
 #!/usr/bin/python3
+import requests
+from requests import Request, Session
+import json
+import logging
+
+FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+BST = "bootstrap"
+BSS = "bootstrap-static"
+BSD = "bootstrap-dynamic"
+MYTEAM = "my-team/"
+ENTRY = "entry/"
+USER_SUMMARY_SUBURL = "element-summary/"
+LCS_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+PLAYERS_INFO_SUBURL = "bootstrap-static"
+PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
+STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ############################################
 # todo: add a method that prints a list of every league this player
@@ -61,7 +79,7 @@ class player_entry:
         """Cycle thru all my Classic Leagues & print them"""
         """This will not access/print GLOBAL leagues (e.g. EPL Team leagues, Country leagues etc)"""
 
-        logging.info('player_entry:: my_entry_cleagues(): - Init method. scan league: %s' % this_league )
+        # logging.info('player_entry:: my_entry_cleagues(): - Init method. scan league: %s' % this_league )
         #print ( "Team name: %s" % self.entry['name'] )
         #print (self.entry['name'], "plays in %s leagues" % len(self.cleagues))
         p = 1

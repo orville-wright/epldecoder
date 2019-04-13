@@ -391,7 +391,7 @@ if game_week is False:
 else:
     print ( game_week )                      # otherwise, use the gameweek supplied in args[]
 
-my_priv_data = priv_playerinfo(this_player, username, password )
+my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )
 if priv_playerinfo.api_get_status == "FAILED":
     print ( " " )
     print ( "Failed to access private data set for player:", this_player )
@@ -402,7 +402,7 @@ else:
 if this_league is False:
     print ( "No fav league provided. Not showing Fav league LEADERBOARD" )
     print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-    print ( "======================= my leagues =======================" )
+    print ( "======================= my leagues 1 =======================" )
     i_am.my_entry_cleagues()
     print ("==========================================================" )
 else:
@@ -410,18 +410,19 @@ else:
     if fav_league.league_exists != 404:
         print ( " " )
         print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        print ( "======================= my leagues =======================" )
+        print ( "======================= my leagues 2 =======================" )
         i_am.my_entry_cleagues()
         print ( " ")
         print ( "============== League leaderbord for %s ==============" % this_league )
         #fav_league.whose_inmy_league()    # classic league leaderboard
-        fav_league.allmy_cl_lboard()
+        fav_league.allmy_cl_lboard(this_league)
         print ( "==========================================================" )
     else:
         print ( "ERROR - bad fav league number entered" )
 
 print ( " " )
 print ( "======================= my squad =======================" )
+#my_priv_data.list_mysquad(bootstrap)
 my_priv_data.list_mysquad()
 print ( "==========================================================" )
 
@@ -434,7 +435,7 @@ else:
     #for rank,opp_id in fav_league.cl_op_list.items():                 # method local var/dict
     for rank, opp_id in league_details.cl_op_list.items():              # class.global var/dict
         opp_pe_inst = player_entry(opp_id)                             # instance: player_entry(opp_id)
-        opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week)    # create instance of this players squad (for gw event)
+        opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
         opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
     print ( "==========================================================" )
 

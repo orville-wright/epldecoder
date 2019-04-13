@@ -1,4 +1,24 @@
 #!/usr/bin/python3
+import requests
+from requests import Request, Session
+from requests.auth import HTTPBasicAuth
+from requests.auth import HTTPDigestAuth
+import json
+import logging
+
+FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+BST = "bootstrap"
+BSS = "bootstrap-static"
+BSD = "bootstrap-dynamic"
+MYTEAM = "my-team/"
+ENTRY = "entry/"
+USER_SUMMARY_SUBURL = "element-summary/"
+LCS_SUBURL = "leagues-classic-standings/"
+LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
+PLAYERS_INFO_SUBURL = "bootstrap-static"
+PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
+STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ####
 # Get the full squad player/position list for any team
@@ -17,14 +37,19 @@ class get_opponents_squad:
     """note: can only access historical squad data from last game back (which is public data) """
     """must be called with a sucessfully populated instance of Player_ENTRY() """
 
-    def __init__(self, player_idnum, pe_live_inst, event_id):
+    bst_inst = ""
+
+    def __init__(self, player_idnum, pe_live_inst, event_id, my_priv_data, bootstrap):
         # Base bootstrap API calls (..premierleague.com/drf/...) dont require authentication
         # but, if you want explict details about a team, you must authenticate your API call
 
         PLAYER_ENTRY = str(player_idnum)
+        self.bst_inst = bootstrap
         self.pe_live_inst = pe_live_inst              # player ENTRY instance for this player - critical for de-ref'ing data
-        self.username = priv_playerinfo.username      # username from glocal class var
-        self.password = priv_playerinfo.password      # password from global class var
+        self.username = my_priv_data.username      # username from global class var
+        self.password = my_priv_data.password      # password from global class var
+        get_opponents_squad.bst_inst = self.bst_inst
+#        self.password = priv_playerinfo.password      # password from global class var
 
         logging.info('get_opponents_squad(): - Inst class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
         s1 = requests.Session()
@@ -121,8 +146,8 @@ class get_opponents_squad:
                 pass
             elif t7['is_captain'] is True:                    # is this squad player the CAPTAIN?:
                 find_me = t7['element']                       # get unique player ID for squad player
-                capt_name = bootstrap.whois_element(find_me)  # scan main payer data set - each time (!!slow-ish ~600 entities )
-                capt_gw_points = bootstrap.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
+                capt_name = self.bst_inst.whois_element(find_me)  # scan main payer data set - each time (!!slow-ish ~600 entities )
+                capt_gw_points = self.bst_inst.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
                 print ( self.t1['entry'], "(", end="" )
                 print ( oppt_tname, end="" )
                 print ( ") - Week:", self.t2['id'], \
@@ -146,7 +171,7 @@ class get_opponents_squad:
 
         fp_id = int(f_playerid)                           # must use INT for tests
         oppt_tname = self.pe_live_inst.my_teamname()      # accessor to resolve additional ref'd player ENTRY data
-        p_name = bootstrap.whois_element(fp_id)      # scans main data set - each time (!!slow-ish ~600 entities )
+        p_name = self.bst_inst.whois_element(fp_id)      # scans main data set - each time (!!slow-ish ~600 entities )
         t7 = []                                           # temp working dict to hold this users squad players
         for player_num in range (0, 15):                  # note: hard-coded 14 players in a team
             t7 = self.t3[player_num]                      # scanning each squad player details (not likley to ever change)
