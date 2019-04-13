@@ -178,7 +178,7 @@ class get_opponents_squad:
             if t7['element'] == fp_id:
                 print ("Opponent:", self.t1['entry'], \
                         oppt_tname, \
-                        "- Week:", self.t2['id'], \
+                        #"- Week:", self.t2['id'], \
                         "- HAS:", t7['element'], \
                         "**", p_name, \
                         "@ pos:", t7['position'] )
@@ -190,9 +190,10 @@ class get_opponents_squad:
 
         print ( "Opponent:", self.t1['entry'], \
                 oppt_tname, \
-                "- Week:", self.t2['id'], \
-                "- not in squad:", fp_id, \
-                p_name )
+                #"- Week:", self.t2['id'], \
+                "- not in squad" )
+                #, fp_id, \
+                #p_name )
         return
 
         #!! needs to be fast by re-using player_entry inst

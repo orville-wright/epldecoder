@@ -422,10 +422,11 @@ else:
 
 print ( " " )
 print ( "======================= my squad =======================" )
-#my_priv_data.list_mysquad(bootstrap)
 my_priv_data.list_mysquad()
 print ( "==========================================================" )
 
+# if NO -l <LEAGUE ID> flag, then we're not intersted in league analytics
+# if YES, then create a leaderbaord for <LEAGUE_ID> with some stats
 if this_league is False:
     pass
 else:
@@ -439,26 +440,29 @@ else:
         opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
     print ( "==========================================================" )
 
-print ( " " )
-print ( "======================== Fixtures ========================" )
-bootstrap.upcomming_fixtures()
-
-print ( "===== HACKING =====" )
+# this function scans your squad, looking for a specific <Player_ID>
+# only works if -l <LEAGUE_ID> provided
 if query_player is False:
     print ( "===== not querying for any player =====" )
 else:
     find_me = bootstrap.whois_element(int(query_player))
+    print ( " ")
     print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
-    print ( "Scanning for squad player:", query_player, end="" )
+    print ( "Scanning opponents quad for player:", query_player, end="" )
     print ( " (", end="" )
     print ( find_me, end="" )
     print ( ")" )
     for rank, opp_id in league_details.cl_op_list.items():  # [] <- player_ids in this league
         x_inst = player_entry(opp_id)        # instantiate a full player ENTRY instance
-        opp_x_inst = get_opponents_squad(opp_id, x_inst, game_week )
+        opp_x_inst = get_opponents_squad(opp_id, x_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
         opp_x_inst.opp_sq_findplayer(query_player)
-
     print ( "==========================================================" )
+
+# next 10 fixtures
+print ( " " )
+print ( "======================== Fixtures ========================" )
+bootstrap.upcomming_fixtures()
+
 
 # I cant recall what this section is supposed to do
 # This is cool code, but its very complicated & doesnt work properly from a results/output perspective.
