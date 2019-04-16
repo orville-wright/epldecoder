@@ -327,142 +327,140 @@ def fpl_myteam_get(player_idnum):
 
     return
 
-###########################################
-# Main()
-#
-parser = argparse.ArgumentParser(description='List out basic details for a player')
-parser.add_argument('-d','--dbload', help='save JSON data into mongodb', action='store_true', dest='bool_dbload', required=False, default=False)
-parser.add_argument('-l','--league', help='league entry id', required=False, default=False)
-parser.add_argument('-p','--player', help='team player id', required=False, default='noplayerid')
-parser.add_argument('-q','--query', help='squad player id', required=False, default=False)
-parser.add_argument('-r','--recleague', help='recursive league details', action='store_true', dest='bool_recleague', required=False, default=False)
-parser.add_argument('-v','--verbose', help='verbose error logging', action='store_true', dest='bool_verbose', required=False, default=False)
-parser.add_argument('-x','--xray', help='enable all test vars/functions', action='store_true', dest='bool_xray', required=False, default=False)
-parser.add_argument('-u','--username', help='username for accessing website', required=True, default='iamnobody')
-parser.add_argument('-c','--password', help='password for accessing website', required=True, default='nopassword')
-parser.add_argument('-g','--gameweek', help='game weeks to analyze', required=False, default=False)
 
-args = vars(parser.parse_args())
+####################### main ###########################
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-d','--dbload', help='save JSON data into mongodb', action='store_true', dest='bool_dbload', required=False, default=False)
+    parser.add_argument('-l','--league', help='league entry id', required=False, default=False)
+    parser.add_argument('-p','--player', help='team player id', required=False, default='noplayerid')
+    parser.add_argument('-q','--query', help='squad player id', required=False, default=False)
+    parser.add_argument('-r','--recleague', help='recursive league details', action='store_true', dest='bool_recleague', required=False, default=False)
+    parser.add_argument('-v','--verbose', help='verbose error logging', action='store_true', dest='bool_verbose', required=False, default=False)
+    parser.add_argument('-x','--xray', help='enable all test vars/functions', action='store_true', dest='bool_xray', required=False, default=False)
+    parser.add_argument('-u','--username', help='username for accessing website', required=True, default='iamnobody')
+    parser.add_argument('-c','--password', help='password for accessing website', required=True, default='nopassword')
+    parser.add_argument('-g','--gameweek', help='game weeks to analyze', required=False, default=False)
 
-print ( " " )
-print ( "########## Initalizing bootstrap dataset ##########" )
-print ( " " )
-
-################
-# ARGS[] pre-processing
-#
-if args['bool_verbose'] is True:
-    print ( "Enabeling verbose info logging..." )
-    logging.disable(0)     # Log level = NOTSET
-    print ( "Command line args passed from shell..." )
-    print ( parser.parse_args() )
+    args = vars(parser.parse_args())
     print ( " " )
-else:
-    logging.disable(20)    # Log lvel = INFO
+    print ( "########## Initalizing bootstrap dataset ##########" )
+    print ( " " )
 
-username = args['username']
-password = args['password']
-this_player = args['player']
-this_league = args['league']
-rleague = args['bool_recleague']
-xray_testing = args['bool_xray']
-query_player = args['query']
-game_week = args['gameweek']
+# ARGS[] pre-processing - set-ip logging before anything else
+    if args['bool_verbose'] is True:
+        print ( "Enabeling verbose info logging..." )
+        logging.disable(0)     # Log level = NOTSET
+        print ( "Command line args passed from shell..." )
+        print ( parser.parse_args() )
+        print ( " " )
+    else:
+        logging.disable(20)    # Log lvel = INFO
 
-# ARGS[] processing done
-#################
+    # now process remainder of cmdline args[]
+    username = args['username']
+    password = args['password']
+    this_player = args['player']
+    this_league = args['league']
+    rleague = args['bool_recleague']
+    xray_testing = args['bool_xray']
+    query_player = args['query']
+    game_week = args['gameweek']
 
 # load in main bootstrap data set.
 # THis is a big JSON dataset. Every EPL squad player and his data/stats etc.
-bootstrap = fpl_bootstrap(this_player, args['username'], args['password'])         # create an instance of main player database
-i_am = player_entry(this_player)                      # create instance of players basic ENTRY data-set (publically viewable stuff)
+    bootstrap = fpl_bootstrap(this_player, args['username'], args['password'])         # create an instance of main player database
+    i_am = player_entry(this_player)                      # create instance of players basic ENTRY data-set (publically viewable stuff)
 
-print ( "My name is:", i_am.entry['player_first_name'], i_am.entry['player_last_name'] )
-print ( "My teams name is:", i_am.entry['name'] )
-print ( "My team ID is:", i_am.playeridnum )
+    print ( "My name is:", i_am.entry['player_first_name'], i_am.entry['player_last_name'] )
+    print ( "My teams name is:", i_am.entry['name'] )
+    print ( "My team ID is:", i_am.playeridnum )
 #print ( "My Username:", username )
 #print ( "My Passowrd:", password )
 
-print ( "Current gameweek is:", fpl_bootstrap.current_event )
-print ( "Analyzing gameweek: ", end="" )
-if game_week is False:
-    print ( fpl_bootstrap.current_event )    # default to current gameweek
-    game_week = fpl_bootstrap.current_event
-else:
-    print ( game_week )                      # otherwise, use the gameweek supplied in args[]
-
-my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )
-if priv_playerinfo.api_get_status == "FAILED":
-    print ( " " )
-    print ( "Failed to access private data set for player:", this_player )
-else:
-    my_priv_data.my_stats()
-    print ( " " )
-
-if this_league is False:
-    print ( "No fav league provided. Not showing Fav league LEADERBOARD" )
-    print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-    print ( "======================= my leagues 1 =======================" )
-    i_am.my_entry_cleagues()
-    print ("==========================================================" )
-else:
-    fav_league = league_details(this_player, this_league)    # populate an instance of my classic leagues
-    if fav_league.league_exists != 404:
-        print ( " " )
-        print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        print ( "======================= my leagues 2 =======================" )
-        i_am.my_entry_cleagues()
-        print ( " ")
-        print ( "============== League leaderbord for %s ==============" % this_league )
-        #fav_league.whose_inmy_league()    # classic league leaderboard
-        fav_league.allmy_cl_lboard(this_league)
-        print ( "==========================================================" )
+    print ( "Current gameweek is:", fpl_bootstrap.current_event )
+    print ( "Analyzing gameweek: ", end="" )
+    if game_week is False:
+        print ( fpl_bootstrap.current_event )    # default to current gameweek
+        game_week = fpl_bootstrap.current_event
     else:
-        print ( "ERROR - bad fav league number entered" )
+        print ( game_week )                      # otherwise, use the gameweek supplied in args[]
 
-print ( " " )
-print ( "======================= my squad =======================" )
-my_priv_data.list_mysquad()
-print ( "==========================================================" )
+    my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )
+    if priv_playerinfo.api_get_status == "FAILED":
+        print ( " " )
+        print ( "Failed to access private data set for player:", this_player )
+    else:
+        my_priv_data.my_stats()
+        print ( " " )
+
+    if this_league is False:
+        print ( "No fav league provided. Not showing Fav league LEADERBOARD" )
+        print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
+        print ( "======================= my leagues =======================" )
+        i_am.my_entry_cleagues()
+        print ("==========================================================" )
+    else:
+        fav_league = league_details(this_player, this_league)    # populate an instance of my classic leagues
+        if fav_league.league_exists != 404:
+            print ( " " )
+            print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
+            print ( "======================= my leagues =======================" )
+            i_am.my_entry_cleagues()
+            print ( " ")
+            print ( "============== League leaderbord for %s ==============" % this_league )
+            #fav_league.whose_inmy_league()    # classic league leaderboard
+            fav_league.allmy_cl_lboard(this_league)
+            print ( "==========================================================" )
+        else:
+            print ( "ERROR - bad fav league number entered" )
+
+    print ( " " )
+    print ( "======================= my squad =======================" )
+    my_priv_data.list_mysquad()
+    print ( "==========================================================" )
 
 # if NO -l <LEAGUE ID> flag, then we're not intersted in league analytics
 # if YES, then create a leaderbaord for <LEAGUE_ID> with some stats
-if this_league is False:
-    pass
-else:
-    print ( " " )
-    print ( "============== Squad Analytics for gameweek: %s ==============" % game_week )
-    my_priv_data.capt_anlytx()
+    if this_league is False:
+        pass
+    else:
+        print ( " " )
+        print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
+        my_priv_data.capt_anlytx()
     #for rank,opp_id in fav_league.cl_op_list.items():                 # method local var/dict
-    for rank, opp_id in league_details.cl_op_list.items():              # class.global var/dict
-        opp_pe_inst = player_entry(opp_id)                             # instance: player_entry(opp_id)
-        opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
-        opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
-    print ( "==========================================================" )
+        for rank, opp_id in league_details.cl_op_list.items():              # class.global var/dict
+            opp_pe_inst = player_entry(opp_id)                             # instance: player_entry(opp_id)
+            opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
+            opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
+        print ( "==========================================================" )
 
 # this function scans your squad, looking for a specific <Player_ID>
 # only works if -l <LEAGUE_ID> provided
-if query_player is False:
-    print ( "===== not querying for any player =====" )
-else:
-    find_me = bootstrap.whois_element(int(query_player))
-    print ( " ")
-    print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
-    print ( "Scanning opponents quad for player:", query_player, end="" )
-    print ( " (", end="" )
-    print ( find_me, end="" )
-    print ( ")" )
-    for rank, opp_id in league_details.cl_op_list.items():  # [] <- player_ids in this league
-        x_inst = player_entry(opp_id)        # instantiate a full player ENTRY instance
-        opp_x_inst = get_opponents_squad(opp_id, x_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
-        opp_x_inst.opp_sq_findplayer(query_player)
-    print ( "==========================================================" )
+    if query_player is False:
+        print ( "===== not querying for any player =====" )
+    else:
+        find_me = bootstrap.whois_element(int(query_player))
+        print ( " ")
+        print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
+        print ( "Scanning opponents quad for player:", query_player, end="" )
+        print ( " (", end="" )
+        print ( find_me, end="" )
+        print ( ")" )
+        for rank, opp_id in league_details.cl_op_list.items():  # [] <- player_ids in this league
+            x_inst = player_entry(opp_id)        # instantiate a full player ENTRY instance
+            opp_x_inst = get_opponents_squad(opp_id, x_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
+            opp_x_inst.opp_sq_findplayer(query_player)
+        print ( "==========================================================" )
 
 # next 10 fixtures
-print ( " " )
-print ( "======================== Fixtures ========================" )
-bootstrap.upcomming_fixtures()
+    print ( " " )
+    print ( "======================== Fixtures ========================" )
+    bootstrap.upcomming_fixtures()
+    print ( "### DONE ###" )
 
+if __name__ == '__main__':
+    main()
 
 # I cant recall what this section is supposed to do
 # This is cool code, but its very complicated & doesnt work properly from a results/output perspective.
@@ -489,9 +487,7 @@ bootstrap.upcomming_fixtures()
 #fpl_myteam_get(this_player)   # currently hard-coded player ID
 #bootstrap.list_epl_teams()
 
-print ( "### DONE ###" )
-
-# todo
+# TODO
 # convert fpl_myteam_get() to class player_mysquad
 # convert get_opponents_squad() to class opponent_pub_view
 # arg[dbload] - now does nothing since main() is now 100% class/method orientated

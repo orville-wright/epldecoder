@@ -29,6 +29,7 @@ CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 # WARNINGS:
 # 1. could be Network/API expensive if called recurrsively on multiple players/oponents
+#    becasue a full html JSON API extract must be done per player
 # 2. Currently considers "you" as an opponent
 #    (i.e no checks to exclude "you". need smarter way to know this)
 #
@@ -150,7 +151,8 @@ class get_opponents_squad:
                 capt_gw_points = self.bst_inst.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
                 print ( self.t1['entry'], "(", end="" )
                 print ( oppt_tname, end="" )
-                print ( ") - Week:", self.t2['id'], \
+                print ( ")" \
+                        # "- Week:", self.t2['id'], \
                         "- Captain is:", t7['element'], \
                         "@ pos:", t7['position'], \
                         "-", capt_name, end="" )
@@ -176,7 +178,8 @@ class get_opponents_squad:
         for player_num in range (0, 15):                  # note: hard-coded 14 players in a team
             t7 = self.t3[player_num]                      # scanning each squad player details (not likley to ever change)
             if t7['element'] == fp_id:
-                print ("Opponent:", self.t1['entry'], \
+                # TODO: load results into dict & sort by total points, then print in desc order
+                print ("Team:", self.t1['entry'], \
                         oppt_tname, \
                         #"- Week:", self.t2['id'], \
                         "- HAS:", t7['element'], \
@@ -188,7 +191,7 @@ class get_opponents_squad:
                 #print ( ".", end="" )
                 pass
 
-        print ( "Opponent:", self.t1['entry'], \
+        print ( "Team:", self.t1['entry'], \
                 oppt_tname, \
                 #"- Week:", self.t2['id'], \
                 "- not in squad" )
