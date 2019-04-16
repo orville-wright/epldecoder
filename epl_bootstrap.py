@@ -443,7 +443,7 @@ def main():
         find_me = bootstrap.whois_element(int(query_player))
         print ( " ")
         print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
-        print ( "Scanning opponents quad for player:", query_player, end="" )
+        print ( "Scanning opponents squad for player:", query_player, end="" )
         print ( " (", end="" )
         print ( find_me, end="" )
         print ( ")" )
@@ -462,6 +462,7 @@ def main():
 if __name__ == '__main__':
     main()
 
+# import pdb; pdb.set_trace()
 # I cant recall what this section is supposed to do
 # This is cool code, but its very complicated & doesnt work properly from a results/output perspective.
 #if rleague is True:    # recursively list league details for player (all players in this league and leaderboard for this league)

@@ -156,7 +156,7 @@ class priv_playerinfo:
         logging.info('priv_playerinfo:: list_mysquad() - Analyzing captain for team %s' % self.playeridnum )
         squad = []                            # temp working []
         for sp in range (0, 15):              # note: squad_player hard-coded to 14 players per team
-            print ("\tSquad member:", sp+1, end="")
+            print ("Squad member:", sp+1, end="")
             print ("...", end="" )
 
             squad = self.picks[sp]            # access data heirachery of my squad list of players
@@ -174,7 +174,8 @@ class priv_playerinfo:
             self.gw_points = self.bst_inst.element_gw_points(find_me)
             print ( player_name, "(", end="" )
             print ( squad['element'], end="" )
-            print ( ") - @ pos:", squad['position'], \
+            print ( ")" \
+                    # " - @ pos:", squad['position'], \
                     "-", player_type, \
                     "$:", squad['selling_price']/10, \
                     "- points (", end="" )

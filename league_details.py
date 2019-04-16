@@ -193,7 +193,7 @@ class league_details:
 
         for v in self.results:
             a = str(this_league)
-            print ( "\t Rank: %s Team: %s %s - %s - Gameweek points: %s" % ( \
+            print ( "Rank: %s Team: %s %s - %s - Gameweek points: %s" % ( \
                     v['rank'], \
                     v['entry'], v['entry_name'], \
                     v['player_name'], \
