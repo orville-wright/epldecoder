@@ -69,8 +69,22 @@ class priv_playerinfo:
         for pl, cookie_hack in pl_profile_cookies.items():
             if pl == self.playeridnum:
                 pp_req.cookies.update({'pl_profile': cookie_hack})
+                logging.info('priv_playerinfo:: SET pl_profile cookie for userid: %s' % pl )
                 logging.info('priv_playerinfo:: SET pl_profile cookie to: %s' % cookie_hack )
+                priv_playerinfo.api_get_status = "GOODCOOKIE"
+                break    # found this players cookie
+            else:
+                logging.info('priv_playerinfo:: ERR userid is bad. No cookie found/set: %s' % pl )
+                priv_playerinfo.api_get_status = "FAILED"
+            # return    #return    # bad style. Need to return useful ERROR code
+                      # but global class var is allways set & testable
 
+        if priv_playerinfo.api_get_status == "FAILED":
+            return
+        else:
+            pass
+        # only continue down here if the cookie hack sucessfully executed...
+        # otherwise, all data extraction will fail.
         rx0 = pp_req.get( API_URL0, headers=user_agent, auth=HTTPBasicAuth(self.username, self.password) )
         rx0_auth_cookie = requests.utils.dict_from_cookiejar(pp_req.cookies)
         logging.info('priv_playerinfo:: AUTH login resp cookie: %s' % rx0_auth_cookie['pl_profile'] )
@@ -107,6 +121,7 @@ class priv_playerinfo:
             self.leagues = t0['leagues']    # data-set of all my classic leagues
             self.picks = t0['picks']        # contains 15 sub-elements of all 15 players in your current squad
                                             # no real human readable data. All refs to data in other structures
+            priv_playerinfo.api_get_status = "SUCCESS"
         return
 
     def my_stats(self):

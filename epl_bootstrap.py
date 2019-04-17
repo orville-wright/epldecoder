@@ -390,6 +390,7 @@ def main():
     if priv_playerinfo.api_get_status == "FAILED":
         print ( " " )
         print ( "Failed to access private data set for player:", this_player )
+        return
     else:
         my_priv_data.my_stats()
         print ( " " )
