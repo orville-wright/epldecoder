@@ -199,4 +199,15 @@ class get_opponents_squad:
                 #p_name )
         return
 
-        #!! needs to be fast by re-using player_entry inst
+    def got_player(self, f_playerid):
+        """Scan a players ENTRY and report back some info"""
+
+        fp_id = int(f_playerid)
+        for player_num in range (0, 15):
+            t7 = self.t3[player_num]
+            if t7['element'] == fp_id:
+                return 1    # found player in opponents squad
+            else:
+                pass        # keep scanning...
+
+        return 0            # did not find player in opponents squad

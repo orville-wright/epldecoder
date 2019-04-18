@@ -386,7 +386,7 @@ def main():
     else:
         print ( game_week )                      # otherwise, use the gameweek supplied in args[]
 
-    my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )
+    my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )    # info about ME
     if priv_playerinfo.api_get_status == "FAILED":
         print ( " " )
         print ( "Failed to access private data set for player:", this_player )
@@ -423,16 +423,20 @@ def main():
 
 # if NO -l <LEAGUE ID> flag, then we're not intersted in league analytics
 # if YES, then create a leaderbaord for <LEAGUE_ID> with some stats
-    if this_league is False:
+    if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
         pass
     else:
         print ( " " )
         print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
-        my_priv_data.capt_anlytx()
-    #for rank,opp_id in fav_league.cl_op_list.items():                 # method local var/dict
-        for rank, opp_id in league_details.cl_op_list.items():              # class.global var/dict
-            opp_pe_inst = player_entry(opp_id)                             # instance: player_entry(opp_id)
-            opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
+        my_priv_data.capt_anlytx()                                        # find MY captain
+        #for rank,opp_id in fav_league.cl_op_list.items():                    # method local var/dict
+        print ( "Scanning all teams in this league...")
+
+        opp_team_inst = {}      # global dict holds player ENTRY & class instance to full squad dataset
+        for rank, opp_id in league_details.cl_op_list.items():            # class.global var/dict
+            opp_pe_inst = player_entry(opp_id)                            # create instance: player_entry(opp_id)
+            opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create inst of squad (for gw event)
+            opp_team_inst[opp_id] = opp_sq_anlytx                         # key = playerid, data = full squad instance pointer
             opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
         print ( "==========================================================" )
 
@@ -440,19 +444,46 @@ def main():
 # only works if -l <LEAGUE_ID> provided
     if query_player is False:
         print ( "===== not querying for any player =====" )
+        print ( " " )
     else:
         find_me = bootstrap.whois_element(int(query_player))
         print ( " ")
         print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
-        print ( "Scanning opponents squad for player:", query_player, end="" )
+        print ( "Scan opponents squad for:", query_player, end="" )
         print ( " (", end="" )
         print ( find_me, end="" )
         print ( ")" )
-        for rank, opp_id in league_details.cl_op_list.items():  # [] <- player_ids in this league
-            x_inst = player_entry(opp_id)        # instantiate a full player ENTRY instance
-            opp_x_inst = get_opponents_squad(opp_id, x_inst, game_week, my_priv_data, bootstrap)    # create instance of this players squad (for gw event)
-            opp_x_inst.opp_sq_findplayer(query_player)
         print ( "==========================================================" )
+        for oppid, inst in opp_team_inst.items():    # cycle through class instances for each opponents team
+            inst.opp_sq_findplayer(query_player)     # very fast. In mem scan. Pre-instantiated from elsewhere
+        print ( "==========================================================" )
+
+# deep analytics of my squad
+# cycle through every player on my team...
+# and then through eveyr player on every team in this leage...
+# and report back, which opponent shares the same players that I selected
+    if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
+        pass
+    else:
+        print ( "================ Deep squad analytics =====================" )
+        for pos in range (0, 15):
+            z = 0
+            tl = " "
+            got_him = my_priv_data.get_oneplayer(pos)
+            for oid, i in opp_team_inst.items():         # cycle through class instances for each opponents team
+                if oid != int(i_am.playeridnum):         # skip my team
+                    found_him = i.got_player(got_him)    # does this player exists in this squad
+                    if found_him == 1:
+                        z += 1
+                        x = player_entry(oid)    # TODO: Optimize by build cached dict of opp_pe_inst()
+                        y = x.my_teamname()
+                        tl = tl + y + " "
+                        #tl + y + " "    # build a concatinated string of team names
+                        #print (y, " ", end="" )
+                    else:
+                        pass
+            print ( z, " teams have this player: ", tl)
+            z = 0
 
 # next 10 fixtures
     print ( " " )

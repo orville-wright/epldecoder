@@ -198,6 +198,35 @@ class priv_playerinfo:
             print ( ")" )
         return
 
+    def get_oneplayer(self, player_num):    # 0...15 are only valid squad member positions
+        """Pull out of my squad a single player. From a specific squad psotion"""
+
+        sp = int(player_num)
+        squad = []
+        squad = self.picks[sp]            # access data heirachery of my squad list of players
+        if squad['is_captain'] is True:
+           player_type = "Captain"
+        elif squad['is_vice_captain'] is True:
+           player_type = "Vice captain"
+        elif squad['is_sub'] is True:
+            player_type = "Sub"
+        else:
+           player_type = "Regular player"
+
+        find_me = squad['element']
+        player_name = self.bst_inst.whois_element(find_me)            # global handle set once @ start
+        self.gw_points = self.bst_inst.element_gw_points(find_me)
+        print ( player_name, "(", end="" )
+        print ( squad['element'], end="" )
+        print ( ")" \
+                # " - @ pos:", squad['position'], \
+                "-", player_type, \
+                # "$:", squad['selling_price']/10, \
+                "- points (", end="" )
+        print ( self.gw_points, end="" )
+        print ( ")" )
+        return int(find_me)    # this players payer_id number
+
     def capt_anlytx(self):
         """examine an oponents team and figure out if he has the same captain as you"""
         logging.info('priv_playerinfo:: capt_anlytx() - Analyzing captain for team %s' % self.playeridnum )
