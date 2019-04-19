@@ -40,22 +40,26 @@ How to find some of the **critical EPL game id's** that are needed for cmd line 
 - Player id is required
 - league id is optional
 
-Player_ID - required
+**Player_ID** - required
 >You *must* know your *Player id* (or a player you want work with) from the real EPL website game: http://www.premierleague.com
+
 To find this number...
+
 1. Log on the Fantasy football website game
 2. Click on the 'Points' menu option
 3. Look up at the browser URL bar. You will see a URL like this...https://fantasy.premierleague.com/a/team/7766554/event/34
 4. Your player ID is the number after the word 'team'. e.g. the number '7766554'
 
-To lookup the player ID of some other game opponent/user, you need to do this...
+>To lookup the player ID of some other game opponent/user, you need to do this...
 1. Click on the 'Leagues' menu option
 2. Select a league that has an opponents team in it that you are interested in
 3. Look up at the browser URL bar. Yo will see a URL like this...https://fantasy.premierleague.com/a/team/33221100/event/34
 4. The players ID is the number after the word 'team'. e.g the number '33221100'
 
-League_ID - optional
+**League_ID** - optional
+
 To find this number...
+
 1. Click on the "Leagues" menu option
 2. Select a league that you are interested in
 3. Look up at the browser URL bar. You will see a URL like this...https://fantasy.premierleague.com/a/leagues/standings/255552/classic
