@@ -16,21 +16,22 @@ v2.0 of the project is focused on the following priorities...
 8. Augmenting the dataset with additional info not currently computed or offered.
 9. Make core game data set available, especially full historical data in non-aggregate form
 
-================================= How to run =================================
+How to run
+=================================
 usage: epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
 
 optional arguments:
-  -c PASSWORD, --password PASSWORD  password for accessing EPL website
-  -d, --dbload                      save JSON data into mongodb
-  -g GAMEWEEK, --gameweek GAMEWEEK  game week to analyze
-  -h, --help                        show this help message and exit
-  -l LEAGUE, --league LEAGUE        league entry id - (a league that you want to evaluate)
-  -p PLAYER, --player PLAYER        team player id - (a valid user ID registered in the EPL websit)
-  -q QUERY, --query QUERY           squad player id - (a valid selectable squad player...eg. Harry Kane's player code)
-  -r, --recleague                   recursive league details - (scan every league you are registered in)
-  -u USERNAME, --username USERNAME  a valid username for accessing EPL website
-  -v, --verbose                     verbose error logging
-  -x, --xray                        dump out some raw JSON data dicts & structures
+- -c PASSWORD, --password PASSWORD  password for accessing EPL website
+- -d, --dbload                      save JSON data into mongodb
+- -g GAMEWEEK, --gameweek GAMEWEEK  game week to analyze
+- -h, --help                        show this help message and exit
+- -l LEAGUE, --league LEAGUE        league entry id - (a league that you want to evaluate)
+- -p PLAYER, --player PLAYER        team player id - (a valid user ID registered in the EPL websit)
+- -q QUERY, --query QUERY           squad player id - (a valid selectable squad player...eg. Harry Kane's player code)
+- -r, --recleague                   recursive league details - (scan every league you are registered in)
+- -u USERNAME, --username USERNAME  a valid username for accessing EPL website
+- -v, --verbose                     verbose error logging
+- -x, --xray                        dump out some raw JSON data dicts & structures
 
 How to find some of the critical EPL game id's that are needed to run this code...
 For example...
@@ -59,8 +60,7 @@ To find this number...
 3. Look up at the browser URL bar. You will see a URL like this...https://fantasy.premierleague.com/a/leagues/standings/255552/classic
 4. The league ID is the number after the word 'standings'. e.g. the number '255552'
 
-==================================== NOTES ===========================================
-
+===========================================
 Notes:
 Augment the game decision making process with additional analytical data sets that are sources from other locations. These will be created & stored within a MongoDB and cross-referenced with the basic game data-set. Today, this is not easy to do via the current game website: http://www.premierleague.com/en-gb.html. Doing this makes deeper team & player analysis more possible (but more complex). and therefore, better team/player decisions are possible. Many of these data sets come from non EPL websites. e.g. FIFA, gambling sites, football stats sites etc.
 
