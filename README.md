@@ -18,7 +18,8 @@ v2.0 of the project is focused on the following priorities...
 
 How to run
 =================================
-usage: epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
+usage:
+epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
 
 optional arguments:
 - -c PASSWORD, --password PASSWORD  password for accessing EPL website
@@ -60,8 +61,9 @@ To find this number...
 3. Look up at the browser URL bar. You will see a URL like this...https://fantasy.premierleague.com/a/leagues/standings/255552/classic
 4. The league ID is the number after the word 'standings'. e.g. the number '255552'
 
-===========================================
+
 Notes:
+=================================
 Augment the game decision making process with additional analytical data sets that are sources from other locations. These will be created & stored within a MongoDB and cross-referenced with the basic game data-set. Today, this is not easy to do via the current game website: http://www.premierleague.com/en-gb.html. Doing this makes deeper team & player analysis more possible (but more complex). and therefore, better team/player decisions are possible. Many of these data sets come from non EPL websites. e.g. FIFA, gambling sites, football stats sites etc.
 
 Also, the MongoDB data source will be used to drive richer analytical charts that are not available on http://www.premierleague.com/en-gb.html, never were available and are very much needed by the 5,000,000+ users of the Barclays EPL website & App.
