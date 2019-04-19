@@ -36,9 +36,10 @@ How to run
 - -v, --verbose                     verbose error logging
 - -x, --xray                        dump out some raw JSON data dicts & structures
 
-How to find some of the **critical EPL game id's** that are needed for cmd line options...
 
 #
+How to find some of the **critical EPL game id's** that are needed for cmd line options...
+
 **For example...**
 - Username & Password are required
 - Player id is required
