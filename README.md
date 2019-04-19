@@ -1,4 +1,6 @@
 # epldecoder
+- (this source doc is formatted in Guthub Markup lang)
+
 EPL Fantasy Football website bootstrap API decoder
 English Premier League Data Analytics AI platform
 
@@ -36,12 +38,14 @@ How to run
 
 How to find some of the **critical EPL game id's** that are needed for cmd line options...
 
+#
 **For example...**
 - Username & Password are required
 - Player id is required
 - league id is optional
 
 
+#
 **Player_ID** - required
 >You *must* know your *Player id* (or a player you want work with) from the real EPL website game: http://www.premierleague.com
 
@@ -59,6 +63,7 @@ To find this number...
 4. The players ID is the number after the word 'team'. e.g the number '33221100'
 
 
+#
 **League_ID** - optional
 
 To find this number...
@@ -71,7 +76,7 @@ To find this number...
 
 Notes:
 =================================
-Augment the game decision making process with additional analytical data sets that are sources from other locations. These will be created & stored within a MongoDB and cross-referenced with the basic game data-set. Today, this is not easy to do via the current game website: http://www.premierleague.com/en-gb.html. Doing this makes deeper team & player analysis more possible (but more complex). and therefore, better team/player decisions are possible. Many of these data sets come from non EPL websites. e.g. FIFA, gambling sites, football stats sites etc.
+The goal is to augment the game decision making process with additional analytical data sets that are sources from other locations. These will be created & stored within a MongoDB and cross-referenced with the basic game data-set. Today, this is not easy to do via the current game website: http://www.premierleague.com/en-gb.html. Doing this makes deeper team & player analysis more possible (but more complex). and therefore, better team/player decisions are possible. Many of these data sets come from non EPL websites. e.g. FIFA, gambling sites, football stats sites etc.
 
 Also, the MongoDB data source will be used to drive richer analytical charts that are not available on http://www.premierleague.com/en-gb.html, never were available and are very much needed by the 5,000,000+ users of the Barclays EPL website & App.
 
@@ -82,13 +87,15 @@ That EPL website used to provided a set of charts to users but this service was 
 A ML/AI engine will also be built and offered to individual players. A player will be able to teach the ML/AI (via a web app/mobile app) to emulate his/her individual analytical team decision making style. Thereby automating the mundane process of choosing a squad by churning through pages of weekly data & relying too much on fuzzy personal logic, gut-feel, intuition, rumors and voodoo on what squad to pick & set-up. This will also allow EPL Fantasy Football players to run 1000's of possible permutations against potential squads (e.g., who to captain, who to vice-captain, when to play a wild card, what to play special options etc...all before the game day cut-off time.
 The ML/AI engine will operate under a set of personalize-able & tunable rules that "you" can define and control and do things like ...
 
-Scan for injury rumors, news and info then compute player not-starting probabilities
-Scan for hot & cold trends
-Extrapolate scoring runs and trends and predict possible 'Black Swan' events
-Compute best captain probabilities
-Compute best & worst games to play/avoid.
-Compute highest scoring probability of each game and player scoring probabilities
-Propose possible teams, transfers and team configs
+- Scan for injury rumors, news and info then compute player not-starting probabilities
+- Scan for hot & cold trends
+- Extrapolate scoring runs and trends and predict possible 'Black Swan' events
+- Compute best captain probabilities
+- Compute best & worst games to play/avoid.
+- Compute highest scoring probability of each game and player scoring probabilities
+- Propose possible teams, transfers and team configs
+
 ...etc, etc
 
+#
 More to come. ~Orville
