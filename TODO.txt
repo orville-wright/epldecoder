@@ -1,5 +1,13 @@
 # TODO
 
-# convert fpl_myteam_get() to class player_mysquad
-# convert get_opponents_squad() to class opponent_pub_view
-# arg[dbload] - now does nothing since main() is now 100% class/method orientated
+# convert fpl_myteam_get() to class player_mysquad - done
+# convert get_opponents_squad() to class opponent_pub_view - done
+
+# arg[dbload] - now does nothing since main() is now 100% class/method when I rebulit v2.0 & python3
+
+# cookies:
+# I am not a low-level web browser guru. So I've hacked some code arround userid cookies. It hard-coded & not flexible for general users.
+# I've reverse engineered and extract cookies from my browers for my testing game userids & hard-coded them into the code.
+# I currrently don't know how to decode and extract a users cookie on the fly in realtime for any user and insert it into the
+# API extract process. This needs to be fixed as it will result in data access failure & incorrect data being extracted
+# for any game user other than me & my tetsing userids/cookies.
