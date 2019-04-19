@@ -18,10 +18,10 @@ v2.0 of the project is focused on the following priorities...
 
 How to run
 =================================
-usage:
-epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
+## usage:
+   epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
 
-optional arguments:
+**optional arguments:**
 - -c PASSWORD, --password PASSWORD  password for accessing EPL website
 - -d, --dbload                      save JSON data into mongodb
 - -g GAMEWEEK, --gameweek GAMEWEEK  game week to analyze
@@ -34,14 +34,14 @@ optional arguments:
 - -v, --verbose                     verbose error logging
 - -x, --xray                        dump out some raw JSON data dicts & structures
 
-How to find some of the critical EPL game id's that are needed to run this code...
-For example...
+How to find some of the **critical EPL game id's** that are needed for cmd line options...
+**For example...**
 - Username & Password are required
 - Player id is required
 - league id is optional
 
 Player_ID - required
-You *must* know your *Player id* (or a player you want work with) from the real EPL website game: http://www.premierleague.com
+>You *must* know your *Player id* (or a player you want work with) from the real EPL website game: http://www.premierleague.com
 To find this number...
 1. Log on the Fantasy football website game
 2. Click on the 'Points' menu option
