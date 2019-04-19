@@ -1,0 +1,5 @@
+# TODO
+
+# convert fpl_myteam_get() to class player_mysquad
+# convert get_opponents_squad() to class opponent_pub_view
+# arg[dbload] - now does nothing since main() is now 100% class/method orientated
