@@ -200,16 +200,17 @@ class fpl_bootstrap:
 ####################### main ###########################
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-c','--password', help='password for accessing website', required=True, default='nopassword')
     parser.add_argument('-d','--dbload', help='save JSON data into mongodb', action='store_true', dest='bool_dbload', required=False, default=False)
+    parser.add_argument('-g','--gameweek', help='game weeks to analyze', required=False, default=False)
     parser.add_argument('-l','--league', help='league entry id', required=False, default=False)
-    parser.add_argument('-p','--player', help='team player id', required=False, default='noplayerid')
+    parser.add_argument('-p','--player', help='team player id', required=True, default='noplayerid')
     parser.add_argument('-q','--query', help='squad player id', required=False, default=False)
     parser.add_argument('-r','--recleague', help='recursive league details', action='store_true', dest='bool_recleague', required=False, default=False)
+    parser.add_argument('-u','--username', help='username for accessing website', required=True, default='iamnobody')
     parser.add_argument('-v','--verbose', help='verbose error logging', action='store_true', dest='bool_verbose', required=False, default=False)
     parser.add_argument('-x','--xray', help='enable all test vars/functions', action='store_true', dest='bool_xray', required=False, default=False)
-    parser.add_argument('-u','--username', help='username for accessing website', required=True, default='iamnobody')
-    parser.add_argument('-c','--password', help='password for accessing website', required=True, default='nopassword')
-    parser.add_argument('-g','--gameweek', help='game weeks to analyze', required=False, default=False)
+
 
     args = vars(parser.parse_args())
     print ( " " )
