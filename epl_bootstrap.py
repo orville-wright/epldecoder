@@ -78,6 +78,7 @@ class fpl_bootstrap:
     username = ""
     password = ""
     current_event = ""
+    api_get_status = ""
 
     def __init__(self, playeridnum, username, password):
         self.playeridnum = str(playeridnum)
@@ -90,24 +91,45 @@ class fpl_bootstrap:
 
         self.epl_team_names = {}    # global dict accessible from wihtin this base class
         s = requests.Session()
-
-        # WARNING: This cookie must be updated each year at the start of the season as it is changed each year.
-        #s.cookies.update({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19'})
-        s.cookies.update({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWVOWUo4OjE1QWNaRW5EYlIwM2I4bk1HZDBqX3Z5VVk2WSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDgsICJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQifX0='})
-
-        user_agent = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5;Windows NT)'}
+        user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
         API_URL1 = FPL_API_URL + BST
 
-        # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
-        # 2nd get does the data extraction if auth succeeds
+# WARNING: This cookie must be updated each year at the start of the season as it is changed each year.
+# 2018 cookie - ({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19'})
+# 2019 cookie - ({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWVOWUo4OjE1QWNaRW5EYlIwM2I4bk1HZDBqX3Z5VVk2WSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDgsICJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQifX0='})
+# 2019 worked - ({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19'})
+        pl_profile_cookies = { \
+                '1212166': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19', \
+                '1136396': 'eyJzIjogIld6VXNOVGc0T0RnM05WMDoxZnYzYWo6WGkxd1lMMnpLeW1pbThFTTVFeGEzVFdUaWtBIiwgInUiOiB7ImxuIjogIkJyYWNlIiwgImZjIjogOCwgImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIn19' }
 
+        for pl, cookie_hack in pl_profile_cookies.items():
+            if pl == self.playeridnum:
+                s.cookies.update({'pl_profile': cookie_hack})
+                logging.info('fpl_bootstrap:: SET pl_profile cookie for userid: %s' % pl )
+                logging.info('fpl_bootstrap:: SET pl_profile cookie to: %s' % cookie_hack )
+                fpl_bootstrap.api_get_status = "GOODCOOKIE"
+                break    # found this players cookie
+            else:
+                logging.info('fpl_bootstrap:: ERR userid is bad. No cookie found/set: %s' % pl )
+                fpl_bootstrap.api_get_status = "FAILED"
+
+        if fpl_bootstrap.api_get_status == "FAILED":
+            return
+        else:
+            pass
+            
+# REST API I/O now... - 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
+# 2nd get does the data extraction if auth succeeds - failure = all JSON dicts/fields are empty
         rx0 = s.get( API_URL0, headers=user_agent, auth=HTTPBasicAuth(self.username, self.password) )
         rx1 = s.get( API_URL1, headers=user_agent, auth=HTTPDigestAuth(self.username, self.password) )
         self.auth_status = rx0.status_code
         self.gotdata_status = rx1.status_code
         logging.info('fpl_bootstrap:: - init - Logon AUTH url: %s' % rx0.url )
         logging.info('fpl_bootstrat:: - init - API data get url: %s' % rx1.url )
+
+        rx0_auth_cookie = requests.utils.dict_from_cookiejar(s.cookies)
+        logging.info('fpl_bootstrap:: AUTH login resp cookie: %s' % rx0_auth_cookie['pl_profile'] )
 
         if rx0.status_code != 200:    # failed to authenticate
             logging.info('fpl_bootstrap:: - init ERROR login AUTH failed with resp %s' % self.auth_status )
@@ -122,7 +144,7 @@ class fpl_bootstrap:
             # create JSON dict with players ENTRY data, plus other data thats now available
             # WARNING: This is a very large JSON data structure with stats on every squad/player in the league
             #          Dont load into memory multiple times. Best to insert into mongodb & access from there
-            #
+            # EXTRACT JSON data/fields...
             # note: entry[] and player[] are not auto loaded when dataset lands (not sure why)
             t0 = json.loads(rx1.text)
             self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
