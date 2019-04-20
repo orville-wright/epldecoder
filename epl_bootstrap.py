@@ -38,16 +38,12 @@ PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
 STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
 CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
-# warning:
-# code is now written for Python3
-# and is 100% object/method
-#
 ############################################
-# API calls agaist the bootstrap url (..premierleague.com/drf/...) dont require any authentication, for any valid player id
-# but, if you want explict details about a players team, then you must authenticate as that user
-# for all remaining API calls (..premierleague.com/drf/...)
+# Basic API calls agaist the bootstrap url (..premierleague.com/drf/...) dont require any authentication,
+# for any valid game opponent player id. but...if you want explict details about a game player/user team
+# then you must authenticate as a vlaid game user. for all API calls (..premierleague.com/drf/...)
 #
-# Known API functions
+# Known API endpoint functions
 #
 # League standings:
 # 'https://fantasy.premierleague.com/drf/leagues-classic-standings/<player-id>?phase=1&le-page=1&ls-page=1'
@@ -118,7 +114,7 @@ class fpl_bootstrap:
             return
         else:
             pass
-            
+
 # REST API I/O now... - 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
 # 2nd get does the data extraction if auth succeeds - failure = all JSON dicts/fields are empty
         rx0 = s.get( API_URL0, headers=user_agent, auth=HTTPBasicAuth(self.username, self.password) )
@@ -218,6 +214,20 @@ class fpl_bootstrap:
             #print ( "Team:", team_name['id'], team_name['short_name'], team_name['name'] )
             self.epl_team_names[team_name['id']] = team_name['name']    # populate the class dict, which is accessible within the class fpl_bootstrap()
         return
+
+
+def scan_pe_cache(pe_cache, pe_key):
+    """scan the global Player ENTRY instance cache"""
+    """for a player id"""
+    """Will error is pe_cache is not real dict"""
+
+    if pe_key in pe_cache:
+        # print ( "Player ENTRY instance found:", pe_cache[pe_key] )
+        return pe_cache[pe_key]
+    else:
+        pass
+        #print ( "NO Player ENTRY instance present" )
+    return
 
 ####################### main ###########################
 def main():
@@ -324,11 +334,13 @@ def main():
         #for rank,opp_id in fav_league.cl_op_list.items():                    # method local var/dict
         print ( "Scanning all teams in this league...")
 
-        opp_team_inst = {}      # global dict holds player ENTRY & class instance to full squad dataset
+        pe_inst_cache = {}      # global optz cache of all opponent player ENTRY instances
+        opp_team_inst = {}      # global optz cache of all player ENTRY & class instance to full squad dataset
         for rank, opp_id in league_details.cl_op_list.items():            # class.global var/dict
             opp_pe_inst = player_entry(opp_id)                            # create instance: player_entry(opp_id)
             opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create inst of squad (for gw event)
-            opp_team_inst[opp_id] = opp_sq_anlytx                         # key = playerid, data = full squad instance pointer
+            opp_team_inst[opp_id] = opp_sq_anlytx                         # build cache : key = playerid, data = full squad instance
+            pe_inst_cache[opp_id] = opp_pe_inst                           # build cache : key = playerid, data = PE instance
             opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
         print ( "==========================================================" )
 
@@ -363,16 +375,14 @@ def main():
             tl = " "
             print ( "Player:", pos, " ", end="" )
             got_him = my_priv_data.get_oneplayer(pos)
-            for oid, i in opp_team_inst.items():         # cycle through class instances for each opponents team
+            for oid, i in opp_team_inst.items():         # cycle through class instances cache for each opponents team
                 if oid != int(i_am.playeridnum):         # skip my team
                     found_him = i.got_player(got_him)    # does this player exists in this squad
                     if found_him == 1:
                         z += 1
-                        x = player_entry(oid)    # TODO: Optimize by build cached dict of opp_pe_inst()
+                        x = scan_pe_cache(pe_inst_cache, oid)   # pe_inst_cache is a global dict, populated elesewhere !!
                         y = x.my_teamname()
                         tl = tl + y + " "
-                        #tl + y + " "    # build a concatinated string of team names
-                        #print (y, " ", end="" )
                     else:
                         pass
             print ( "Found in: ", z, "teams -", tl)
