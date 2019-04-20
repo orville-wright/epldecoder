@@ -55,7 +55,7 @@ CLASSIC_PAGE = "&le-page=1&ls-page=1"
 #
 # https://fantasy.premierleague.com/drf/bootstrap
 # https://fantasy.premierleague.com/drf/bootstrap-static
-# https://fantasy.premierleague.com/drf/bootstrap-dynamic
+# https://fantasy.premierleague.com/drf/bootstrap-dynamic    # should use this for initial login & cookie decode/hacking
 #
 # https://fantasy.premierleague.com/drf/entry/1980723
 # https://fantasy.premierleague.com/drf/event/23/live

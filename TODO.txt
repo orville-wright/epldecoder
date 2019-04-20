@@ -11,3 +11,7 @@
 # I currrently don't know how to decode and extract a users cookie on the fly in realtime for any user and insert it into the
 # API extract process. This needs to be fixed as it will result in data access failure & incorrect data being extracted
 # for any game user other than me & my tetsing userids/cookies.
+
+# API endpoint : bootstrap-dynamic
+# this is a ver small & simple API endpoint JSON dataset and might be easier to leverage
+# as an API endpoint for initial userid cookie decode hacking

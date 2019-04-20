@@ -49,7 +49,7 @@ class fpl_bootstrap:
 
         logging.info('fpl_bootstrap:: - create bootstrap ENTRY class instance for player: %s' % self.playeridnum )
 
-        self.epl_team_names = {}    # global dict accessible from wihtin this base class
+        self.epl_team_names = {}    # global helper dict accessible from wihtin this base class
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
@@ -158,19 +158,25 @@ class fpl_bootstrap:
         """its just a quick way to  what fixtures are approaching in the near future"""
 
         logging.info('fpl_bootstrap: :upcomming_fixtures()...' )
-        tn_idx = fpl_bootstrap.list_epl_teams(self)
+        tn_idx = fpl_bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
         print ( "Next 10 fixtures..." )
         for fixture in self.next_event_fixtures:
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
+# do some analytics on fixtures...
+            #h_rank
+            #a_rank
+            #rank_missmatch = h_rank - a_rank    # bigger number = large disparity, more probability of big scoring game
+            #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
+            #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
+            #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
             print ( "Game week:", fixture['event'], "Game day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") Teams - HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
             #print ( "Home team:", self.t[idx_h] )
             #print ( "Away team:", self.t[idx_a] )
         return
 
-
     def list_epl_teams(self):
-        """populate a small dict that holds epl team ID and real names"""
+        """populate a small private class helper dict that holds epl team ID and real names"""
         """this dict is accessible via the base class fpl_bootstrap"""
 
         logging.info('fpl_bootstrap:: list_epl_teams()...setup a dict of team IDs + NAMES for easy reference' )
