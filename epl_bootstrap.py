@@ -318,8 +318,13 @@ def main():
         else:
             print ( "ERROR - bad fav league number entered" )
 
+
+# This is inaccurate. Its looking at your active live current squad
+# point earned is irrelevant becauset they will be what that player earned in the last game.
+# probably should be showing squad for last game
     print ( " " )
-    print ( "======================= my squad =======================" )
+    print ( "========================== my squad ===========================" )
+    print ( "============= Warning: this is your active squad ==============" )
     my_priv_data.list_mysquad()
     print ( "==========================================================" )
 
@@ -363,14 +368,15 @@ def main():
         print ( "==========================================================" )
 
 # deep analytics of my squad
-# cycle through every player on my team...
-# and then through eveyr player on every team in this leage...
-# and report back, which opponent shares the same players that I selected
+# cycle through every player on my squad...(yor artive current squad)
+# cycle through eveyr player on every team in this leage...(for the last game)
+# report back, which opponent shares the same squad players e.g your squad <==> opponents
     if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
         pass
     else:
         print ( " " )
         print ( "=========== Deep squad analytics against my squad =============" )
+        print ( "============= Warning: this is your active squad ==============" )
         for pos in range (0, 15):
             z = 0
             tl = ""
