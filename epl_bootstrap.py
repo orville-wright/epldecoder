@@ -391,7 +391,7 @@ def main():
             else:
                 print ( "Unique player not in any opponents squad" )
 
-            print ( "..." )
+            print ( "+--------------------------------------------------------+" )
             z = 0
 
 # next 10 fixtures
