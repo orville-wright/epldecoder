@@ -18,7 +18,7 @@ v2.0 of the project is focused on the following priorities...
 8. Augmenting the game dataset with additional data/info where key data/fields/structures are not present/provided in native EPPL game & datasets.
 9. Enable users with ability to apply State-of-Art Datascience logic to game decision making. e.g. analysis, statistcs & probably A/B Hypothesis testing against EPL game data (via Datasciecne tools such as: Numpy, Pandas, Matplotlib, Scikit-Learn, Scipy & the Berkley Datascience module). Goal is to provide this capability via a Web/GUI experince, not force EPL game players to use shell & write python code.
 9. Make core game data sets available, especially full historical data in non-aggregate form
-10. Augment EPL game data with additional correlated game data from other non-EPL sources. e.g. FIFA, gambliing website sites (e.g. odds), football status sites, Footbal news/rumor sites etc. Enable this additinal data to be leveraged by users in advanced inferrental Datascience based analytical game decisons. 
+10. Augment EPL game data with additional correlated game data from other non-EPL sources. e.g. FIFA, gambliing website sites (e.g. odds), football status sites, Footbal news/rumor sites etc. Enable this additinal data to be leveraged by users in advanced inferrental Datascience based analytical game decisons.
 
 - Not all of these capabilities are available in v2.0
 
@@ -26,7 +26,7 @@ v2.0 of the project is focused on the following priorities...
 How to run
 =================================
 ## usage:
-   epl_bootstrap.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
+   epldecoder.py [-h] [-d] [-l LEAGUE] [-p PLAYER] [-q QUERY] [-r] [-v] [-x] -u USERNAME -c PASSWORD [-g GAMEWEEK]
 
 **optional arguments:**
 - -c PASSWORD, --password PASSWORD  password for accessing EPL website
