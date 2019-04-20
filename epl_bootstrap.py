@@ -369,10 +369,11 @@ def main():
     if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
         pass
     else:
+        print ( " " )
         print ( "=========== Deep squad analytics against my squad =============" )
         for pos in range (0, 15):
             z = 0
-            tl = " "
+            tl = ""
             print ( "Player:", pos, " ", end="" )
             got_him = my_priv_data.get_oneplayer(pos)
             for oid, i in opp_team_inst.items():         # cycle through class instances cache for each opponents team
@@ -385,7 +386,12 @@ def main():
                         tl = tl + y + " "
                     else:
                         pass
-            print ( "Found in: ", z, "teams -", tl)
+            if z != 0:
+                print ( "Found in: ", z, "teams >", tl)
+            else:
+                print ( "Unique player not in any opponents squad" )
+
+            print ( "..." )
             z = 0
 
 # next 10 fixtures
