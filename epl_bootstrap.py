@@ -271,7 +271,7 @@ def main():
 
 # load in main bootstrap data set.
 # THis is a big JSON dataset. Every EPL squad player and his data/stats etc.
-    bootstrap = fpl_bootstrap(this_player, args['username'], args['password'])         # create an instance of main player database
+    bootstrap = fpl_bootstrap(this_player, username, password)         # create an instance of main player database
     i_am = player_entry(this_player)                      # create instance of players basic ENTRY data-set (publically viewable stuff)
 
     print ( "My name is:", i_am.entry['player_first_name'], i_am.entry['player_last_name'] )
