@@ -73,7 +73,7 @@ def scan_pe_cache(pe_cache, pe_key):
         # print ( "Player ENTRY instance found:", pe_cache[pe_key] )
         return pe_cache[pe_key]
     else:
-        pass
+        return 0
         #print ( "NO Player ENTRY instance present" )
     return
 
@@ -217,14 +217,16 @@ def main():
 
 # deep analytics of my squad
 # cycle through every player on my squad...(yor artive current squad)
-# cycle through eveyr player on every team in this leage...(for the last game)
+# cycle through eveyr player on every team in **this_leage**...(for the last game)
 # report back, which opponent shares the same squad players e.g your squad <==> opponents
     if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
         pass
     else:
         print ( " " )
-        print ( "=========== Deep squad analytics against my squad =============" )
-        print ( "============= Warning: this is your active squad ==============" )
+        print ( "=========== Deep squad analytx for my active squad =============" )
+        print ( "===================== For league (", end="" )
+        print ( this_league, end="" )
+        print ( ") ======================" )
         for pos in range (0, 15):
             z = 0
             tl = ""
