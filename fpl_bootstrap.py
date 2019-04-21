@@ -5,6 +5,7 @@ import json
 import sys
 import unicodedata
 import logging
+import http.client
 
 from requests.auth import HTTPBasicAuth
 from requests.auth import HTTPDigestAuth
@@ -39,6 +40,8 @@ class fpl_bootstrap:
     password = ""
     current_event = ""
     api_get_status = ""
+    standings_t = ""
+
 
     def __init__(self, playeridnum, username, password):
         self.playeridnum = str(playeridnum)
@@ -183,4 +186,29 @@ class fpl_bootstrap:
         for team_name in self.teams:
             #print ( "Team:", team_name['id'], team_name['short_name'], team_name['name'] )
             self.epl_team_names[team_name['id']] = team_name['name']    # populate the class dict, which is accessible within the class fpl_bootstrap()
+        return
+
+    def get_standings(self):
+        """Full current league table database"""
+        """uses https://www.football-data.org API (my free throttled/limited API account """
+
+        connection = http.client.HTTPConnection('api.football-data.org')
+        headers = { 'X-Auth-Token': '01232ee1842c428291d3a04091e25916' }              # my private API token (throtteled @ 10 calls/min)
+        connection.request('GET', '/v2/competitions/PL/standings', None, headers )    # EPL standings
+        t1 = json.loads(connection.getresponse().read().decode())
+        #print (t1)
+        logging.info('fpl_bootstrap:: get_standings() - init')
+        #    t1 = json.loads(rx1.text)
+        self.filters = t1['filters']
+        self.competition = t1['competition']
+        self.season = t1['season']
+        self.standings = t1['standings']
+        self.regular_season_t = self.standings[0]    # standings totals
+        self.regular_season_h = self.standings[1]    # standings home
+        self.regular_season_a = self.standings[2]    # standings away
+        self.standings_t_table = self.regular_season_t['table']    # data
+        self.standings_h_table = self.regular_season_h['table']    # data
+        self.standings_a_table = self.regular_season_h['table']    # data
+
+        fpl_bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
         return

@@ -254,6 +254,26 @@ def main():
     print ( " " )
     print ( "======================== Fixtures ========================" )
     bootstrap.upcomming_fixtures()
+
+    bootstrap.get_standings()
+    # print ( "Standings JSON table: ", bootstrap.standings_t )
+    standings = []
+    standings = bootstrap.standings_t
+    standings_table = standings['table']
+    standings_pos = standings_table['position']    # positions 1...20
+    #standings_team = standings_table['team']
+    #standings_games = standings_table['playedGames']
+    #standings_w = standings_table['won']
+    #standings_d = standings_table['draw']
+    #standings_l = standings_table['lost']
+    #standings_pts = standings_table['points']
+    #standings_gf = standings_table['goalsFor']
+    #standings_ga = standings_table['goalsAgainst']
+    #standings_gd = standings_table['goalsDifference']
+    for pos, i in standings_pos.items():
+        print ( "Team: ", i)
+
+    print
     print ( "### DONE ###" )
 
 if __name__ == '__main__':
