@@ -255,23 +255,7 @@ def main():
     print ( "======================== Fixtures ========================" )
     bootstrap.upcomming_fixtures()
 
-    bootstrap.get_standings()
-    # print ( "Standings JSON table: ", bootstrap.standings_t )
-    standings = []
-    standings = bootstrap.standings_t
-    standings_table = standings['table']    # a single JSON []array with all 20 teams
-    for pos in range (0, 20):
-        stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
-        stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
-        stp_pg = stp['playedGames']         # number of games played
-        stp_w = stp['won']
-        stp_d = stp['draw']
-        stp_l = stp['lost']
-        stp_pts = stp['points']
-        stp_gf = stp['goalsFor']
-        stp_ga = stp['goalsAgainst']
-        stp_gd = stp['goalDifference']
-        print ( "POS: ", pos+1, " ", stp_team, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
+    bootstrap.game_decisions()
 
     print ( " " )
     print ( "### DONE ###" )

@@ -173,7 +173,7 @@ class fpl_bootstrap:
             #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
-            print ( "Game week:", fixture['event'], "Game day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") Teams - HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
+            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
             #print ( "Home team:", self.t[idx_h] )
             #print ( "Away team:", self.t[idx_a] )
         return
@@ -189,7 +189,7 @@ class fpl_bootstrap:
         return
 
     def get_standings(self):
-        """Full current league table database"""
+        """Create a full current league standings database & make avail in gloabl bootstrap instance"""
         """uses https://www.football-data.org API (my free throttled/limited API account """
 
         connection = http.client.HTTPConnection('api.football-data.org')
@@ -211,4 +211,26 @@ class fpl_bootstrap:
         self.standings_a_table = self.regular_season_h['table']    # data
 
         fpl_bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
+        return
+
+    def game_decisions(self):
+        self.get_standings()         # allways make sure league standings is updated/current before we start
+        standings = []
+        standings = fpl_bootstrap.standings_t       # load latest league standings
+        standings_table = standings['table']    # a single JSON []array with all 20 teams
+        for pos in range (0, 20):
+            stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
+            stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
+            stp_pg = stp['playedGames']         # number of games played
+            stp_w = stp['won']
+            stp_d = stp['draw']
+            stp_l = stp['lost']
+            stp_pts = stp['points']
+            stp_gf = stp['goalsFor']
+            stp_ga = stp['goalsAgainst']
+            stp_gd = stp['goalDifference']
+            #game_delta = pos - pos
+            #gd_delta = stp_gd - stp_gd
+            #best_game = game_delta*gd_delta
+            print ( "POS: ", pos+1, " ", stp_team, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
         return
