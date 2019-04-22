@@ -174,8 +174,10 @@ class fpl_bootstrap:
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
             print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
-            #print ( "Home team:", self.t[idx_h] )
-            #print ( "Away team:", self.t[idx_a] )
+            #print ( "Home team:", self.epl_team_names[idx_h] )
+            #print ( "Away team:", self.epl_team_names[idx_a] )
+            print ( "Home team:", idx_h )
+            print ( "Away team:", idx_a )
         return
 
     def list_epl_teams(self):
@@ -215,12 +217,38 @@ class fpl_bootstrap:
 
     def game_decisions(self):
         self.get_standings()         # allways make sure league standings is updated/current before we start
+        # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
+        # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
+        # elements - 0 = www://football-data.org , 1 = www://fantasy.premierleague.com
+
+        #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
+        teamid_xlt = {'1044': 91, \
+                        '57': 3, \
+                        '397': 36, \
+                        '328': 90, \
+                        '715': 97, \
+                        '61': 8, \
+                        '354': 31, \
+                        '62': 11, \
+                        '63': 54, \
+                        '394': 38, \
+                        '338': 13, \
+                        '64': 14, \
+                        '65': 43, \
+                        '66': 1, \
+                        '67': 4, \
+                        '340': 20, \
+                        '73': 8, \
+                        '346': 57, \
+                        '563': 21, \
+                        '76': 39 }
         standings = []
         standings = fpl_bootstrap.standings_t       # load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
         for pos in range (0, 20):
             stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
             stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
+            stp_teamid = stp['team']['id']
             stp_pg = stp['playedGames']         # number of games played
             stp_w = stp['won']
             stp_d = stp['draw']
@@ -232,5 +260,5 @@ class fpl_bootstrap:
             #game_delta = pos - pos
             #gd_delta = stp_gd - stp_gd
             #best_game = game_delta*gd_delta
-            print ( "POS: ", pos+1, " ", stp_team, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
+            #print ( "POS: ", pos+1, " ", stp_team, "API ID: ", stp_teamid, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
         return

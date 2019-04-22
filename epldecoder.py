@@ -255,7 +255,7 @@ def main():
     print ( "======================== Fixtures ========================" )
     bootstrap.upcomming_fixtures()
 
-    bootstrap.game_decisions()
+    bootstrap.game_decisions()    # no longer makes sense
 
     print ( " " )
     print ( "### DONE ###" )
