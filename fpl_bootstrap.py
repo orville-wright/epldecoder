@@ -174,10 +174,12 @@ class fpl_bootstrap:
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
             print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
+            #print ( "Gameplay decison: ", end="" )
+            self.game_decisions(idx_h, idx_a)
             #print ( "Home team:", self.epl_team_names[idx_h] )
             #print ( "Away team:", self.epl_team_names[idx_a] )
-            print ( "Home team:", idx_h )
-            print ( "Away team:", idx_a )
+            #print ( "Home team:", idx_h )
+            #print ( "Away team:", idx_a )
         return
 
     def list_epl_teams(self):
@@ -215,33 +217,43 @@ class fpl_bootstrap:
         fpl_bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
         return
 
-    def game_decisions(self):
-        self.get_standings()         # allways make sure league standings is updated/current before we start
+    def game_decisions(self, team_h, team_a):
+        #self.get_standings()         # allways make sure league standings is updated/current before we start
         # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
         # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
         # elements - 0 = www://football-data.org , 1 = www://fantasy.premierleague.com
 
         #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
-        teamid_xlt = {'1044': 91, \
-                        '57': 3, \
-                        '397': 36, \
-                        '328': 90, \
-                        '715': 97, \
-                        '61': 8, \
-                        '354': 31, \
-                        '62': 11, \
-                        '63': 54, \
-                        '394': 38, \
-                        '338': 13, \
-                        '64': 14, \
-                        '65': 43, \
-                        '66': 1, \
-                        '67': 4, \
-                        '340': 20, \
-                        '73': 8, \
-                        '346': 57, \
-                        '563': 21, \
-                        '76': 39 }
+        # tuple: very fast but immutable
+        teamid_xlt = (1044, 91, 2, \
+                        57, 3, 1, \
+                        397, 36, 3, \
+                        328, 90, 4, \
+                        715, 97, 5, \
+                        61, 8, 6, \
+                        354, 31, 7, \
+                        62, 11, 8, \
+                        63, 54, 9, \
+                        394, 38, 10, \
+                        338, 13, 11, \
+                        64, 14, 12, \
+                        65, 43, 13, \
+                        66, 1, 14, \
+                        67, 4, 15, \
+                        340, 20, 16, \
+                        73, 8, 17, \
+                        346, 57, 18, \
+                        563, 21, 19, \
+                        76, 39, 20)
+        for tx in range (0, 59, 3):
+            #print ("Team: ", teamid_xlt[tx], " - Code: ", teamid_xlt[tx+2])
+            if teamid_xlt[tx+2] == team_h:
+                home_team = teamid_xlt[tx]
+                print ( "Home team: ", self.epl_team_names[team_h] )
+            elif teamid_xlt[tx+2] == team_a:
+                away_team = teamid_xlt[tx]
+                print ( "Away team: ", self.epl_team_names[team_a] )
+
         standings = []
         standings = fpl_bootstrap.standings_t       # load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
@@ -257,6 +269,7 @@ class fpl_bootstrap:
             stp_gf = stp['goalsFor']
             stp_ga = stp['goalsAgainst']
             stp_gd = stp['goalDifference']
+
             #game_delta = pos - pos
             #gd_delta = stp_gd - stp_gd
             #best_game = game_delta*gd_delta

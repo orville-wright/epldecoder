@@ -253,9 +253,10 @@ def main():
 # next 10 fixtures
     print ( " " )
     print ( "======================== Fixtures ========================" )
+    bootstrap.get_standings()
     bootstrap.upcomming_fixtures()
 
-    bootstrap.game_decisions()    # no longer makes sense
+    bootstrap.game_decisions(328, 338)    # no longer makes sense
 
     print ( " " )
     print ( "### DONE ###" )
