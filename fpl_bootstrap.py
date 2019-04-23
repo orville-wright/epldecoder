@@ -160,7 +160,7 @@ class fpl_bootstrap:
         """the bootstrap database holds a list of the next 10 gameweek fixtures"""
         """its just a quick way to  what fixtures are approaching in the near future"""
 
-        logging.info('fpl_bootstrap: :upcomming_fixtures()...' )
+        logging.info('fpl_bootstrap:: upcomming_fixtures() - init' )
         tn_idx = fpl_bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
         print ( "Next 10 fixtures..." )
         for fixture in self.next_event_fixtures:
@@ -186,7 +186,7 @@ class fpl_bootstrap:
         """populate a small private class helper dict that holds epl team ID and real names"""
         """this dict is accessible via the base class fpl_bootstrap"""
 
-        logging.info('fpl_bootstrap:: list_epl_teams()...setup a dict of team IDs + NAMES for easy reference' )
+        logging.info('fpl_bootstrap:: list_epl_teams() - init' )    # setup a dict of team IDs + NAMES for easy reference
         for team_name in self.teams:
             #print ( "Team:", team_name['id'], team_name['short_name'], team_name['name'] )
             self.epl_team_names[team_name['id']] = team_name['name']    # populate the class dict, which is accessible within the class fpl_bootstrap()
@@ -218,14 +218,15 @@ class fpl_bootstrap:
         return
 
     def game_decisions(self, team_h, team_a):
+        logging.info('fpl_bootstrap:: game_decisions() - init ' )
         #self.get_standings()         # allways make sure league standings is updated/current before we start
         # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
         # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
         # elements - 0 = www://football-data.org , 1 = www://fantasy.premierleague.com
 
         #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
-        # tuple: very fast but immutable
-        teamid_xlt = (1044, 91, 2, \
+        # tuple: very fast but immutable : foorball-data.com-teamID, epl-teamid, bootstrap-teamid
+        self.teamid_xlt = (1044, 91, 2, \
                         57, 3, 1, \
                         397, 36, 3, \
                         328, 90, 4, \
@@ -245,15 +246,30 @@ class fpl_bootstrap:
                         346, 57, 18, \
                         563, 21, 19, \
                         76, 39, 20)
-        for tx in range (0, 59, 3):
-            #print ("Team: ", teamid_xlt[tx], " - Code: ", teamid_xlt[tx+2])
-            if teamid_xlt[tx+2] == team_h:
-                home_team = teamid_xlt[tx]
-                print ( "Home team: ", self.epl_team_names[team_h] )
-            elif teamid_xlt[tx+2] == team_a:
-                away_team = teamid_xlt[tx]
-                print ( "Away team: ", self.epl_team_names[team_a] )
 
+        e = self.team_finder(team_h)
+        self.standings_extractor(e)
+        f = self.team_finder(team_a)
+        self.standings_extractor(f)
+        return
+
+    def team_finder(self, tf):
+        self.tf = tf
+        logging.info('game_decisions.team_finder() - init ', self.tf )
+        for tx in range (0, 59, 3):    # 20 teams x 3 tuplr elements per team
+            #print ("Team: ", teamid_xlt[tx], " - Code: ", teamid_xlt[tx+2])
+            if self.teamid_xlt[tx+2] == self.tf:
+                a = self.teamid_xlt[tx]
+                b = self.teamid_xlt[tx+1]
+                return a    # football-data_teamID, EPL_teamID
+            else:
+                pass    # keep looking for this team in tuple
+
+        return
+
+    def standings_extractor(self, ts):
+        self.ts = ts
+        logging.info('game_decisions.standings_extractor() - init ', self.ts )
         standings = []
         standings = fpl_bootstrap.standings_t       # load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
@@ -269,6 +285,15 @@ class fpl_bootstrap:
             stp_gf = stp['goalsFor']
             stp_ga = stp['goalsAgainst']
             stp_gd = stp['goalDifference']
+            if stp_teamid == ts:
+                #if teamid_xlt[tx+2] == team_h:
+                #home_team = teamid_xlt[tx]
+                print ( "Team: ", self.epl_team_names[self.ts], end="" )    # use EPL bootstrap team NAMES
+                print ( "GF: ", stp_gf)
+                print ( "GA: ", stp_ga)
+                print ( "GD: ", stp_gd)
+            else:
+                pass
 
             #game_delta = pos - pos
             #gd_delta = stp_gd - stp_gd
