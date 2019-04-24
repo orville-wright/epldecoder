@@ -1,0 +1,21 @@
+Game: 1  Team:  'Liverpool FC'  Ranked:  1  GF:  79  GA:  20  GD:  59
+Game: 1  Team:  'Huddersfield Town AFC'  Ranked:  20  GF:  20  GA:  69  GD:  -49
+Game: 2  Team:  'Tottenham Hotspur FC'  Ranked:  3  GF:  65  GA:  35  GD:  30
+Game: 2  Team:  'West Ham United FC'  Ranked:  11  GF:  44  GA:  54  GD:  -10
+Game: 3  Team:  'Crystal Palace FC'  Ranked:  12  GF:  43  GA:  48  GD:  -5
+Game: 3  Team:  'Everton FC'  Ranked:  8  GF:  50  GA:  44  GD:  6
+Game: 4  Team:  'Fulham FC'  Ranked:  19  GF:  33  GA:  76  GD:  -43
+Game: 4  Team:  'Cardiff City F'C  Ranked:  18  GF:  30  GA:  65  GD:  -35
+Game: 5  Team:  'Southampton FC'  Ranked:  16  GF:  41  GA:  58  GD:  -17
+Game: 5  Team:  'AFC Bournemouth'  Ranked:  14  GF:  49  GA:  62  GD:  -13
+Game: 6  Team:  'Watford FC'  Ranked:  7  GF:  50  GA:  50  GD:  0
+Game: 6  Team:  'Wolverhampton Wanderers FC'  Ranked:  10  GF:  41  GA:  42  GD:  -1
+Game: 7  Team:  'Brighton & Hove Albion FC'  Ranked:  17  GF:  32  GA:  54  GD:  -22
+Game: 7  Team:  'Newcastle United FC'  Ranked:  13  GF:  35  GA:  44  GD:  -9
+Game: 8  Team:  'Leicester City F'C  Ranked:  9  GF:  48  GA:  47  GD:  1
+Game: 8  Team:  'Arsenal FC'  Ranked:  5  GF:  68  GA:  43  GD:  25
+Game: 9  Team:  'Burnley FC'  Ranked:  15  GF:  44  GA:  62  GD:  -18
+Game: 9  Team:  'Manchester City FC'  Ranked:  2  GF:  87  GA:  22  GD:  65
+Game: 10  Team:  'Manchester United FC'  Ranked:  6  GF:  63  GA:  48  GD:  15
+Game: 10  Team:  'Chelsea FC'  Ranked:  4  GF:  59  GA:  38  GD:  21
+
