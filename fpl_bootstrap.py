@@ -219,6 +219,9 @@ class fpl_bootstrap:
 
     def game_decisions(self, team_h, team_a):
         logging.info('fpl_bootstrap:: game_decisions() - init ' )
+        self.team_h = team_h
+        self.team_a = team_a
+        self.temp_idx = ""    # temp var populated by return from team_finder()
         #self.get_standings()         # allways make sure league standings is updated/current before we start
         # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
         # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
@@ -247,29 +250,34 @@ class fpl_bootstrap:
                         563, 21, 19, \
                         76, 39, 20)
 
-        e = self.team_finder(team_h)
-        self.standings_extractor(e)
-        f = self.team_finder(team_a)
-        self.standings_extractor(f)
+        logging.info('game_decisions:: finding home team - %s' % self.team_h )
+        home = self.team_finder(self.team_h)
+        logging.info('game_decisions:: Home team tuple code - %s' % home )
+
+        logging.info('game_decisions:: finding away team - %s' % self.team_a )
+        away = self.team_finder(self.team_a)
+        logging.info('game_decisions:: Away team tuple code - %s'% away )
+        self.standings_extractor(home)
+        self.standings_extractor(away)
         return
 
+        # method of fpl_bootstrap.game_decisions()
     def team_finder(self, tf):
         self.tf = tf
-        logging.info('game_decisions.team_finder() - init ', self.tf )
+        logging.info('game_decisions.team_finder() - init %s' % self.tf )
         for tx in range (0, 59, 3):    # 20 teams x 3 tuplr elements per team
-            #print ("Team: ", teamid_xlt[tx], " - Code: ", teamid_xlt[tx+2])
             if self.teamid_xlt[tx+2] == self.tf:
                 a = self.teamid_xlt[tx]
-                b = self.teamid_xlt[tx+1]
+                # game_decisions.temp_idx = ?????
+                # b = self.teamid_xlt[tx+1]
                 return a    # football-data_teamID, EPL_teamID
             else:
                 pass    # keep looking for this team in tuple
-
         return
 
     def standings_extractor(self, ts):
-        self.ts = ts
-        logging.info('game_decisions.standings_extractor() - init ', self.ts )
+        self.se_ts = ts
+        logging.info('game_decisions.standings_extractor() - init %s' % self.se_ts )
         standings = []
         standings = fpl_bootstrap.standings_t       # load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
@@ -285,12 +293,14 @@ class fpl_bootstrap:
             stp_gf = stp['goalsFor']
             stp_ga = stp['goalsAgainst']
             stp_gd = stp['goalDifference']
-            if stp_teamid == ts:
+            if stp_teamid == self.se_ts:
                 #if teamid_xlt[tx+2] == team_h:
                 #home_team = teamid_xlt[tx]
-                print ( "Team: ", self.epl_team_names[self.ts], end="" )    # use EPL bootstrap team NAMES
-                print ( "GF: ", stp_gf)
-                print ( "GA: ", stp_ga)
+                # print ( "Team: ", self.epl_team_names[self.se_ts], end="" )    # use EPL bootstrap team NAMES
+                print ( "Team: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
+                print ( "Ranked: ", pos+1, " ", end="" )
+                print ( "GF: ", stp_gf, " ", end="" )
+                print ( "GA: ", stp_ga, " ", end="" )
                 print ( "GD: ", stp_gd)
             else:
                 pass
