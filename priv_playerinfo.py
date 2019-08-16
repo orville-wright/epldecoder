@@ -8,10 +8,11 @@ import logging
 
 ########################################
 
-FPL_API_URL = "https://fantasy.premierleague.com/drf/"
-BST = "bootstrap"
-BSS = "bootstrap-static"
-BSD = "bootstrap-dynamic"
+#FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
+BST = "bootstrap/"
+BSS = "bootstrap-static/"
+BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 USER_SUMMARY_SUBURL = "element-summary/"
@@ -35,11 +36,12 @@ class priv_playerinfo:
     api_get_status = ""
     bst_inst = ""
 
-    def __init__(self, playeridnum, username, password, bootstrap):
+    def __init__(self, playeridnum, username, password, bootstrap, playerentry):
         self.playeridnum = str(playeridnum)
         self.username = str(username)
         self.password = str(password)
         self.bst_inst = bootstrap
+        self.entrydb = playerentry
         priv_playerinfo.username = self.username
         priv_playerinfo.password = self.password
         priv_playerinfo.bst_inst = self.bst_inst
@@ -56,12 +58,16 @@ class priv_playerinfo:
         # until I can figurre out how pl_profile cookie is programatically set
         # VERY manual & only works for playe ID's predefined here...
         pl_profile_cookies = { \
+
                 '1212166': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19', \
+                '1995215': 'eyJzIjogIld6SXNNalUyTkRBM01USmQ6MWh5aE9BOmdLcXg0S3RkSGR5UVRXRjUwVjhxZHR4RVNTayIsICJ1IjogeyJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQiLCAibG4iOiAiQWxwaGEiLCAiZmMiOiA1N319', \
+                '1994221': 'eyJzIjogIld6SXNOVGc0T0RnM05WMDoxaHlpdU46MlhhRDZlbkx3YU03WFdtb0tBWEhsYXlESlBnIiwgInUiOiB7ImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIiwgImxuIjogIkJyYWNlIiwgImZjIjogOH19', \
                 '1136396': 'eyJzIjogIld6VXNOVGc0T0RnM05WMDoxZnYzYWo6WGkxd1lMMnpLeW1pbThFTTVFeGEzVFdUaWtBIiwgInUiOiB7ImxuIjogIkJyYWNlIiwgImZjIjogOCwgImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIn19' }
 
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
-        API_URL0 = 'https://fantasy.premierleague.com/a/login'
-        API_URL1 = FPL_API_URL + MYTEAM + self.playeridnum
+        API_URL0 = 'https://fantasy.premierleague.com/a/login/'
+#        API_URL0 = 'https://fantasy.premierleague.com/'
+        API_URL1 = FPL_API_URL + MYTEAM + self.playeridnum + '/'
 
         # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
         # 2nd get does the data extraction if auth succeeds
@@ -115,12 +121,20 @@ class priv_playerinfo:
             logging.info('priv_playerinfo:: GET data read resp status : %s' % self.gotdata_status )
             priv_playerinfo.auth_status = self.auth_status
             priv_playerinfo.auth_status = self.gotdata_status
+
             t0 = json.loads(rx1.text)       # load the data from rx1
-            self.chips = t0['chips']
-            self.entry = t0['entry']        # Full public ENTRY data-set
-            self.leagues = t0['leagues']    # data-set of all my classic leagues
             self.picks = t0['picks']        # contains 15 sub-elements of all 15 players in your current squad
                                             # no real human readable data. All refs to data in other structures
+            self.chips = t0['chips']
+            self.transfers = t0['transfers']    # data-set of some transfer info
+
+# depricated in 2019/2020 season
+#            self.chips = t0['chips']
+#            self.entry = t0['entry']        # Full public ENTRY data-set
+#            self.leagues = t0['leagues']    # data-set of all my classic leagues
+#            self.picks = t0['picks']        # contains 15 sub-elements of all 15 players in your current squad
+#                                            # no real human readable data. All refs to data in other structures
+
             priv_playerinfo.api_get_status = "SUCCESS"
         return
 
@@ -129,8 +143,8 @@ class priv_playerinfo:
 
         logging.info( "priv_playerinfo:: my_stats()" )
         #print ( "Team name: %s" % self.entry['name'] )
-        print ("My overall points: %s" % self.entry['summary_overall_points'])
-        print ("Points in last game: %s" % self.entry['summary_event_points'])
+        print ("My overall points: %s" % self.entrydb.my_overall_points() )
+        print ("Points in last game: %s" % self.entrydb.my_event_points() )
         return
 
     def mysquad_insertdb(self):
@@ -155,8 +169,8 @@ class priv_playerinfo:
                player_type = "Captain"
             elif squad['is_vice_captain'] is True:
                player_type = "Vice captain"
-            elif squad['is_sub'] is True:
-                player_type = "Sub"
+#            elif squad['is_sub'] is True:
+#                player_type = "Sub"
             else:
                player_type = "Regular player"
                result = dbcol.insert({ "Team": self.entry['name'], "week": self.entry['current_event'], "Player": squad['element'], "Position": squad['position'], "Player_type": player_type, "Price": squad['selling_price'] })
@@ -179,8 +193,8 @@ class priv_playerinfo:
                player_type = "Captain"
             elif squad['is_vice_captain'] is True:
                player_type = "Vice captain"
-            elif squad['is_sub'] is True:
-                player_type = "Sub"
+#            elif squad['is_sub'] is True:    # seems to have been removed in 2019/2020 season
+#                player_type = "Sub"
             else:
                player_type = "Regular player"
 
@@ -208,8 +222,8 @@ class priv_playerinfo:
            player_type = "Captain"
         elif squad['is_vice_captain'] is True:
            player_type = "Vice captain"
-        elif squad['is_sub'] is True:
-            player_type = "Sub"
+#        elif squad['is_sub'] is True:
+#            player_type = "Sub"
         else:
            player_type = "Regular player"
 

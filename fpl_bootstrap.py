@@ -15,12 +15,14 @@ from six import itervalues
 # logging setup
 logging.basicConfig(level=logging.INFO)
 
-FPL_API_URL = "https://fantasy.premierleague.com/drf/"
-BST = "bootstrap"
-BSS = "bootstrap-static"
-BSD = "bootstrap-dynamic"
+# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
+BST = "bootstrap/"
+BSS = "bootstrap-static/"
+BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
+ME = "me/"
 USER_SUMMARY_SUBURL = "element-summary/"
 LCS_SUBURL = "leagues-classic-standings/"
 LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
@@ -56,7 +58,8 @@ class fpl_bootstrap:
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
-        API_URL1 = FPL_API_URL + BST
+#        API_URL0 = 'https://fantasy.premierleague.com/'
+        API_URL1 = FPL_API_URL + BSS
 
 # WARNING: This cookie must be updated each year at the start of the season as it is changed each year.
 # 2018 cookie - ({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19'})
@@ -64,6 +67,8 @@ class fpl_bootstrap:
 # 2019 worked - ({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19'})
         pl_profile_cookies = { \
                 '1212166': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19', \
+                '1995215': 'eyJzIjogIld6SXNNalUyTkRBM01USmQ6MWh5aE9BOmdLcXg0S3RkSGR5UVRXRjUwVjhxZHR4RVNTayIsICJ1IjogeyJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQiLCAibG4iOiAiQWxwaGEiLCAiZmMiOiA1N319', \
+                '1994221': 'eyJzIjogIld6SXNOVGc0T0RnM05WMDoxaHlpdU46MlhhRDZlbkx3YU03WFdtb0tBWEhsYXlESlBnIiwgInUiOiB7ImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIiwgImxuIjogIkJyYWNlIiwgImZjIjogOH19', \
                 '1136396': 'eyJzIjogIld6VXNOVGc0T0RnM05WMDoxZnYzYWo6WGkxd1lMMnpLeW1pbThFTTVFeGEzVFdUaWtBIiwgInUiOiB7ImxuIjogIkJyYWNlIiwgImZjIjogOCwgImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIn19' }
 
         for pl, cookie_hack in pl_profile_cookies.items():
@@ -110,19 +115,28 @@ class fpl_bootstrap:
             # EXTRACT JSON data/fields...
             # note: entry[] and player[] are not auto loaded when dataset lands (not sure why)
             t0 = json.loads(rx1.text)
-            self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
-            self.player = t0['player']                  # initially empty
-            self.element_types = t0['element_types']
-            self.next_event = t0['next-event']          # global accessor within data-set (do not modify)
-            self.phases = t0['phases']
-            self.stats = t0['stats']
-            self.game_settings = t0['game-settings']
-            self.current_event = t0['current-event']    # global accessor in class (do not modify)
-            self.teams = t0['teams']                    # All details of EPL teams in Premieership league this year
-            self.stats_options = t0['stats_options']
-            self.entry = t0['entry']                    # initially empty
-            self.next_event_fixtures = t0['next_event_fixtures']    # array of the next 10 fixtures (could be played across multiple days)
             self.events = t0['events']
+            self.game_settings = t0['game_settings']
+            self.phases = t0['phases']
+            self.teams = t0['teams']                    # All details of EPL teams in Premieership league this year
+            self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
+            self.stats = t0['element_stats']              # big data-set for every EPL squad player full details/stats
+            self.element_types = t0['element_types']
+
+# THis JSON model was depricated in 2019/2020 season
+            #self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
+            # self.player = t0['player']                  # initially empty
+            #self.element_types = t0['element_types']
+            #self.next_event = t0['next-event']          # global accessor within data-set (do not modify)
+            #self.phases = t0['phases']
+            #self.stats = t0['stats']
+            #self.game_settings = t0['game-settings']
+            #self.current_event = t0['current-event']    # global accessor in class (do not modify)
+            #self.teams = t0['teams']                    # All details of EPL teams in Premieership league this year
+            #self.stats_options = t0['stats_options']
+            #self.entry = t0['entry']                    # initially empty
+            #self.next_event_fixtures = t0['next_event_fixtures']    # array of the next 10 fixtures (could be played across multiple days)
+            #self.events = t0['events']
 
             fpl_bootstrap.current_event = self.current_event    # set class global var so current week is easily accessible
         return

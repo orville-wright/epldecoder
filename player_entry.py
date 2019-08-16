@@ -4,10 +4,11 @@ from requests import Request, Session
 import json
 import logging
 
-FPL_API_URL = "https://fantasy.premierleague.com/drf/"
-BST = "bootstrap"
-BSS = "bootstrap-static"
-BSD = "bootstrap-dynamic"
+# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
+BST = "bootstrap/"
+BSS = "bootstrap-static/"
+BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 USER_SUMMARY_SUBURL = "element-summary/"
@@ -27,10 +28,12 @@ class player_entry:
     """This works for any valid EPL player/opponent ID in the league"""
     """but can only acesses the public data set (i.e. not current squad info)"""
 
+    current_event = ""
+
     def __init__(self, playeridnum):
         self.playeridnum = str(playeridnum)
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
-        EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum
+        EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
         s = requests.Session()
         rx = s.get(EXTRACT_URL)    # basic non-authenticated API request on a player ENTRY
@@ -42,15 +45,25 @@ class player_entry:
             logging.info('player_entry:: - ERROR GET response code is %s' % self.player_exists )
             return
         else:
-            # create JSON dict with players ENTRY data, plus other data thats now available
             logging.info('player_entry:: - init API GET response code was %s' % self.player_exists )
+            # create JSON dict with players ENTRY data, plus other data thats now available
             s2 = json.loads(rx.text)
-            self.entry = s2['entry']
+#            print (s2)
+            self.entry = s2
+            self.entryid = s2['id']
+            self.current_event = s2['current_event']
             self.leagues = s2['leagues']
             self.cleagues = self.leagues['classic']
             self.h2hleagues = self.leagues['h2h']
-            self.cupleagues = self.leagues['cup']
-            self.current_event = self.entry['current_event']
+
+# depricated as of 2019/2020 season
+#            self.entry = s2['entry']
+#            self.leagues = s2['leagues']
+#            self.cleagues = self.leagues['classic']
+#            self.h2hleagues = self.leagues['h2h']
+#            self.cupleagues = self.leagues['cup']
+            player_entry.current_event = self.current_event
+
         return
 
     def my_name(self):
@@ -58,7 +71,7 @@ class player_entry:
         """Based on the EPL game ENTRY ID number"""
 
         logging.info('player_entry:: my_name() - Init method' )
-        #print ( self.entry['player_first_name'], self.entry['player_last_name'], end="" )
+        # print ( self.entry['player_first_name'], self.entry['player_last_name'], end="" )
         return self.entry['player_first_name'] + " " + self.entry['player_last_name']
 
     def my_id(self):
@@ -66,7 +79,7 @@ class player_entry:
 
         logging.info( 'player_entry:: my_id() - Init method' )
         #print ( self.entry['id'], end="" )
-        return  self.entry['id']
+        return  self.entryid
 
     def my_teamname(self):
         """Get the name of my team"""
@@ -74,6 +87,18 @@ class player_entry:
         logging.info( 'player_entry:: my_teamname() - Init method' )
         #print ( self.entry['name'], end="" )
         return self.entry['name']
+
+    def my_overall_points(self):
+        """Get my teams overall points total"""
+
+        logging.info( 'player_entry:: my_overall_points() - Init method' )
+        return self.entry['summary_overall_points']
+
+    def my_event_points(self):
+        """Get my teams points from the very last game"""
+
+        logging.info( 'player_entry:: my_event_points() - Init method' )
+        return self.entry['summary_event_points']
 
     def my_entry_cleagues(self):    # list of all CLASSIC leagues player is entered in
         """Cycle thru all my Classic Leagues & print them"""

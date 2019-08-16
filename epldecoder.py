@@ -23,12 +23,14 @@ from priv_playerinfo import priv_playerinfo
 # logging setup
 logging.basicConfig(level=logging.INFO)
 
-FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
 BST = "bootstrap"
 BSS = "bootstrap-static"
 BSD = "bootstrap-dynamic"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
+ME = "me/"
 USER_SUMMARY_SUBURL = "element-summary/"
 LCS_SUBURL = "leagues-classic-standings/"
 LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
@@ -122,13 +124,16 @@ def main():
     bootstrap = fpl_bootstrap(this_player, username, password)         # create an instance of main player database
     i_am = player_entry(this_player)                      # create instance of players basic ENTRY data-set (publically viewable stuff)
 
-    print ( "My name is:", i_am.entry['player_first_name'], i_am.entry['player_last_name'] )
-    print ( "My teams name is:", i_am.entry['name'] )
-    print ( "My team ID is:", i_am.playeridnum )
+#    print ( "My name is:", i_am.entry['player_first_name'], i_am.entry['player_last_name'] )
+    print ( "My name is:", i_am.my_name() )
+    print ( "My teams name is:", i_am.my_teamname() )
+    print ( "My team ID is:", i_am.my_id() )
 #print ( "My Username:", username )
 #print ( "My Passowrd:", password )
 
-    print ( "Current gameweek is:", fpl_bootstrap.current_event )
+#    print ( "Current gameweek is:", fpl_bootstrap.current_event )
+    print ( "Current gameweek is:", player_entry.current_event )
+
     print ( "Analyzing gameweek: ", end="" )
     if game_week is False:
         print ( fpl_bootstrap.current_event )    # default to current gameweek
@@ -136,7 +141,7 @@ def main():
     else:
         print ( game_week )                      # otherwise, use the gameweek supplied in args[]
 
-    my_priv_data = priv_playerinfo(this_player, username, password, bootstrap )    # info about ME
+    my_priv_data = priv_playerinfo(this_player, username, password, bootstrap, i_am )    # info about ME
     if priv_playerinfo.api_get_status == "FAILED":
         print ( " " )
         print ( "Failed to access private data set for player:", this_player )
@@ -254,7 +259,7 @@ def main():
     print ( " " )
     print ( "======================== Fixtures ========================" )
     bootstrap.get_standings()        # should do this early, or things will fail
-    bootstrap.upcomming_fixtures()
+#    bootstrap.upcomming_fixtures()
 
     # bootstrap.game_decisions(328, 338)    # no longer makes sense
 
