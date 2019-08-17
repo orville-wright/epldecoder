@@ -4,7 +4,6 @@ from requests import Request, Session
 import json
 import logging
 
-# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
 FPL_API_URL = "https://fantasy.premierleague.com/api/"
 BST = "bootstrap/"
 BSS = "bootstrap-static/"
@@ -29,9 +28,11 @@ class player_entry:
     """but can only acesses the public data set (i.e. not current squad info)"""
 
     current_event = ""
+    instowner_player_id = ""    # global attribute. Which player owns this player-entry instance
 
     def __init__(self, playeridnum):
         self.playeridnum = str(playeridnum)
+        player_entry.instowner_player_id = self.playeridnum
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
         EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
@@ -55,15 +56,7 @@ class player_entry:
             self.leagues = s2['leagues']
             self.cleagues = self.leagues['classic']
             self.h2hleagues = self.leagues['h2h']
-
-# depricated as of 2019/2020 season
-#            self.entry = s2['entry']
-#            self.leagues = s2['leagues']
-#            self.cleagues = self.leagues['classic']
-#            self.h2hleagues = self.leagues['h2h']
-#            self.cupleagues = self.leagues['cup']
             player_entry.current_event = self.current_event
-
         return
 
     def my_name(self):

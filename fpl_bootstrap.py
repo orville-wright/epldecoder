@@ -15,21 +15,22 @@ from six import itervalues
 # logging setup
 logging.basicConfig(level=logging.INFO)
 
-# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
 FPL_API_URL = "https://fantasy.premierleague.com/api/"
-BST = "bootstrap/"
 BSS = "bootstrap-static/"
 BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 ME = "me/"
 USER_SUMMARY_SUBURL = "element-summary/"
-LCS_SUBURL = "leagues-classic-standings/"
+LCS_SUBURL = "leagues-classic/"
+#LCS_SUBURL = "leagues-classic-standings/"
 LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
 PLAYERS_INFO_SUBURL = "bootstrap-static"
 PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
-STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
-CLASSIC_PAGE = "&le-page=1&ls-page=1"
+#STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+STANDINGS_URL = "https://fantasy.premierleague.com/api/leagues-classic/"
+PAGINATION = "?page_new_entries=1&page_standings=1&phase=1"
+#CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ############################################
 # note: Must be authourized by credentials
@@ -38,6 +39,8 @@ class fpl_bootstrap:
     """Base class for extracting the core game ENTRY dataset"""
     """This class requires valid credentials"""
     """but does not contain the full player private ENTRY dataset"""
+
+    # Class Global attributes
     username = ""
     password = ""
     current_event = ""
@@ -123,7 +126,7 @@ class fpl_bootstrap:
             self.stats = t0['element_stats']              # big data-set for every EPL squad player full details/stats
             self.element_types = t0['element_types']
 
-# THis JSON model was depricated in 2019/2020 season
+# DELETE ME : THis JSON model was depricated in 2019/2020 season
             #self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
             # self.player = t0['player']                  # initially empty
             #self.element_types = t0['element_types']
@@ -170,32 +173,6 @@ class fpl_bootstrap:
                 pass
         return
 
-    def upcomming_fixtures(self):
-        """the bootstrap database holds a list of the next 10 gameweek fixtures"""
-        """its just a quick way to  what fixtures are approaching in the near future"""
-
-        logging.info('fpl_bootstrap:: upcomming_fixtures() - init' )
-        tn_idx = fpl_bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
-        print ( "Next 10 fixtures..." )
-        for fixture in self.next_event_fixtures:    # BROKEN by 2019/2020 JSON changes
-            idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-            idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-# do some analytics on fixtures...
-            #h_rank
-            #a_rank
-            #rank_missmatch = h_rank - a_rank    # bigger number = large disparity, more probability of big scoring game
-            #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
-            #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
-            #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
-            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
-            #print ( "Gameplay decison: ", end="" )
-            self.game_decisions(idx_h, idx_a)
-            #print ( "Home team:", self.epl_team_names[idx_h] )
-            #print ( "Away team:", self.epl_team_names[idx_a] )
-            #print ( "Home team:", idx_h )
-            #print ( "Away team:", idx_a )
-        return
-
     def list_epl_teams(self):
         """populate a small private class helper dict that holds epl team ID and real names"""
         """this dict is accessible via the base class fpl_bootstrap"""
@@ -206,30 +183,6 @@ class fpl_bootstrap:
             self.epl_team_names[team_name['id']] = team_name['name']    # populate the class dict, which is accessible within the class fpl_bootstrap()
         return
 
-    def get_standings(self):
-        """Create a full current league standings database & make avail in gloabl bootstrap instance"""
-        """uses https://www.football-data.org API (my free throttled/limited API account """
-
-        connection = http.client.HTTPConnection('api.football-data.org')
-        headers = { 'X-Auth-Token': '01232ee1842c428291d3a04091e25916' }              # my private API token (throtteled @ 10 calls/min)
-        connection.request('GET', '/v2/competitions/PL/standings', None, headers )    # EPL standings
-        t1 = json.loads(connection.getresponse().read().decode())
-        #print (t1)
-        logging.info('fpl_bootstrap:: get_standings() - init')
-        #    t1 = json.loads(rx1.text)
-        self.filters = t1['filters']
-        self.competition = t1['competition']
-        self.season = t1['season']
-        self.standings = t1['standings']
-        self.regular_season_t = self.standings[0]    # standings totals
-        self.regular_season_h = self.standings[1]    # standings home
-        self.regular_season_a = self.standings[2]    # standings away
-        self.standings_t_table = self.regular_season_t['table']    # data
-        self.standings_h_table = self.regular_season_h['table']    # data
-        self.standings_a_table = self.regular_season_h['table']    # data
-
-        fpl_bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
-        return
 
     def game_decisions(self, team_h, team_a):
         logging.info('fpl_bootstrap:: game_decisions() - init ' )

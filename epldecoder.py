@@ -19,25 +19,27 @@ from league_details import league_details
 from get_opponents_squad import get_opponents_squad
 from player_entry import player_entry
 from priv_playerinfo import priv_playerinfo
+from fixtures import allfixtures
 
 # logging setup
 logging.basicConfig(level=logging.INFO)
 
-# FPL_API_URL = "https://fantasy.premierleague.com/drf/"
 FPL_API_URL = "https://fantasy.premierleague.com/api/"
-BST = "bootstrap"
 BSS = "bootstrap-static"
 BSD = "bootstrap-dynamic"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 ME = "me/"
 USER_SUMMARY_SUBURL = "element-summary/"
-LCS_SUBURL = "leagues-classic-standings/"
+LCS_SUBURL = "leagues-classic/"
+#LCS_SUBURL = "leagues-classic-standings/"
 LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
 PLAYERS_INFO_SUBURL = "bootstrap-static"
 PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
-STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
-CLASSIC_PAGE = "&le-page=1&ls-page=1"
+STANDINGS_URL = "https://fantasy.premierleague.com/api/leagues-classic/"
+#STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
+PAGINATION = "?page_new_entries=1&page_standings=1&phase=1"
+#CLASSIC_PAGE = "&le-page=1&ls-page=1"
 
 ############################################
 # Basic API calls agaist the bootstrap url (..premierleague.com/drf/...) dont require any authentication,
@@ -131,10 +133,9 @@ def main():
 #print ( "My Username:", username )
 #print ( "My Passowrd:", password )
 
-#    print ( "Current gameweek is:", fpl_bootstrap.current_event )
-    print ( "Current gameweek is:", player_entry.current_event )
+    print ( "Current gameweek is:", player_entry.current_event )    # allways get current event from player-entry
 
-    print ( "Analyzing gameweek: ", end="" )
+    print ( "Analyzing gameweek: ", end="" )    # if the user wants to look back in time at the non-current gameweek
     if game_week is False:
         print ( fpl_bootstrap.current_event )    # default to current gameweek
         game_week = fpl_bootstrap.current_event
@@ -258,8 +259,9 @@ def main():
 # next 10 fixtures
     print ( " " )
     print ( "======================== Fixtures ========================" )
-    bootstrap.get_standings()        # not output - Creates fresh data. Should do this early, or things will fail
-#    bootstrap.upcomming_fixtures()
+    these_fixtures = allfixtures(i_am.playeridnum, bootstrap, player_entry.current_event )
+    these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
+    these_fixtures.upcomming_fixtures()
 
     # bootstrap.game_decisions(328, 338)    # no longer makes sense
 

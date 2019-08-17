@@ -8,7 +8,6 @@ import logging
 
 ########################################
 
-#FPL_API_URL = "https://fantasy.premierleague.com/drf/"
 FPL_API_URL = "https://fantasy.premierleague.com/api/"
 BST = "bootstrap/"
 BSS = "bootstrap-static/"
@@ -66,7 +65,6 @@ class priv_playerinfo:
 
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login/'
-#        API_URL0 = 'https://fantasy.premierleague.com/'
         API_URL1 = FPL_API_URL + MYTEAM + self.playeridnum + '/'
 
         # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
