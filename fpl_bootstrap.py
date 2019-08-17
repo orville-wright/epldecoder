@@ -177,7 +177,7 @@ class fpl_bootstrap:
         logging.info('fpl_bootstrap:: upcomming_fixtures() - init' )
         tn_idx = fpl_bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
         print ( "Next 10 fixtures..." )
-        for fixture in self.next_event_fixtures:
+        for fixture in self.next_event_fixtures:    # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
 # do some analytics on fixtures...

@@ -4,19 +4,23 @@ from requests import Request, Session
 import json
 import logging
 
-FPL_API_URL = "https://fantasy.premierleague.com/drf/"
-BST = "bootstrap"
-BSS = "bootstrap-static"
-BSD = "bootstrap-dynamic"
+#FPL_API_URL = "https://fantasy.premierleague.com/drf/"    # 2019/2020 season changes
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
+BST = "bootstrap/"
+BSS = "bootstrap-static/"
+BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 USER_SUMMARY_SUBURL = "element-summary/"
-LCS_SUBURL = "leagues-classic-standings/"
+#LCS_SUBURL = "leagues-classic-standings/"    # 2019/2020 season changes
+LCS_SUBURL = "leagues-classic/"
 LEAGUE_H2H_STANDING_SUBURL = "leagues-h2h-standings/"
 PLAYERS_INFO_SUBURL = "bootstrap-static"
 PLAYERS_INFO_FILENAME = "allPlayersInfo.json"
-STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"
-CLASSIC_PAGE = "&le-page=1&ls-page=1"
+#STANDINGS_URL = "https://fantasy.premierleague.com/drf/leagues-classic-standings/"    # 2019/2020 season changes
+STANDINGS_URL = "https://fantasy.premierleague.com/api/leagues-classic/"
+PAGINATION = "?page_new_entries=1&page_standings=1&phase=1"
+#CLASSIC_PAGE = "&le-page=1&ls-page=1"    # 2019/2020 season changes
 
 ######################
 # Class that gives better control and visibility into league details for a specific player
@@ -42,7 +46,7 @@ class league_details:
         self.playeridnum = str(playeridnum)
         self.leagueidnum = str(leagueidnum)
         logging.info('class:legue_details() - init: Playerid: %s league num: %s' % (self.playeridnum, self.leagueidnum))
-        EXTRACT_URL = FPL_API_URL + LCS_SUBURL + str(leagueidnum) + '?phase=1&le-page=1&ls-page=1'
+        EXTRACT_URL = FPL_API_URL + LCS_SUBURL + str(leagueidnum) + '/standings/' + PAGINATION
         self.t = requests.Session()
         tx = self.t.get(EXTRACT_URL)
         self.league_exists = tx.status_code

@@ -7,9 +7,10 @@ import json
 import logging
 
 FPL_API_URL = "https://fantasy.premierleague.com/drf/"
-BST = "bootstrap"
-BSS = "bootstrap-static"
-BSD = "bootstrap-dynamic"
+FPL_API_URL = "https://fantasy.premierleague.com/api/"
+BST = "bootstrap/"
+BSS = "bootstrap-static/"
+BSD = "bootstrap-dynamic/"
 MYTEAM = "my-team/"
 ENTRY = "entry/"
 USER_SUMMARY_SUBURL = "element-summary/"
@@ -55,14 +56,39 @@ class get_opponents_squad:
         logging.info('get_opponents_squad(): - Inst class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
         s1 = requests.Session()
 
-        # this will fail
-        # need to add cookie hack
-        s1.cookies.update({'pl_profile': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWVOWUo4OjE1QWNaRW5EYlIwM2I4bk1HZDBqX3Z5VVk2WSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDgsICJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQifX0='})
+        pl_profile_cookies = { \
+                '1212166': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19', \
+                '1995215': 'eyJzIjogIld6SXNNalUyTkRBM01USmQ6MWh5aE9BOmdLcXg0S3RkSGR5UVRXRjUwVjhxZHR4RVNTayIsICJ1IjogeyJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQiLCAibG4iOiAiQWxwaGEiLCAiZmMiOiA1N319', \
+                '1994221': 'eyJzIjogIld6SXNOVGc0T0RnM05WMDoxaHlpdU46MlhhRDZlbkx3YU03WFdtb0tBWEhsYXlESlBnIiwgInUiOiB7ImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIiwgImxuIjogIkJyYWNlIiwgImZjIjogOH19', \
+                '1136396': 'eyJzIjogIld6VXNOVGc0T0RnM05WMDoxZnYzYWo6WGkxd1lMMnpLeW1pbThFTTVFeGEzVFdUaWtBIiwgInUiOiB7ImxuIjogIkJyYWNlIiwgImZjIjogOCwgImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIn19' }
 
-        user_agent = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5;Windows NT)'}
+        user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
+        API_URL0 = 'https://fantasy.premierleague.com/a/login/'
+        API_URL1 = FPL_API_URL + MYTEAM + self.playeridnum + '/'
+
+        # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
+        # 2nd get does the data extraction if auth succeeds
+
+        for pl, cookie_hack in pl_profile_cookies.items():
+            if pl == self.playeridnum:
+                pp_req.cookies.update({'pl_profile': cookie_hack})
+                logging.info('priv_playerinfo:: SET pl_profile cookie for userid: %s' % pl )
+                logging.info('priv_playerinfo:: SET pl_profile cookie to: %s' % cookie_hack )
+                priv_playerinfo.api_get_status = "GOODCOOKIE"
+                break    # found this players cookie
+            else:
+                logging.info('priv_playerinfo:: ERR userid is bad. No cookie found/set: %s' % pl )
+                priv_playerinfo.api_get_status = "FAILED"
+            # return    #return    # bad style. Need to return useful ERROR code
+                      # but global class var is allways set & testable
+
+        if priv_playerinfo.api_get_status == "FAILED":
+            return
+        else:
+            pass
 
         # https://fantasy.premierleague.com/drf/entry/0123456/event/01/picks
-        EXTRACT_URL = FPL_API_URL + ENTRY + PLAYER_ENTRY + "/event/" + str(event_id) + "/picks"
+        EXTRACT_URL = FPL_API_URL + ENTRY + PLAYER_ENTRY + "/event/" + str(event_id) + "/picks/"
 
         # 1st get does the authentication, but must use the critical cookie (i.e. "pl_profile")
         # 2nd get does the real data extraction
@@ -94,46 +120,7 @@ class get_opponents_squad:
                                       # but no nice human readable data. its All refs to data in other []
         return                        # instantiation done & succeded
 
-    def opp_squad_dbload(self):
-        """ load some of an opponents squad data into a MongoDB """
-
-        if self.gotdata_status == 200:                          # read of data set
-            logging.info('get_opponents_squad():: opp_squad_dbload() - Squad data sucessfull extracted')
-            logging.info('get_opponents_squad():: opp_squad_dbload() - API URL: %s' % resp4.request.url)
-
-            logging.info('get_opponents_squad():: opp_squad_dbload() - mongoDB col inserts: eplopsquad_ML')
-            mclient = MongoClient("mongodb://admin:sanfran1@localhost/admin")
-            db = mclient.test1
-            col_2 = db.eplopsquad_ML
-            print ("Insert week", str(event_id), "squad player/position data for oponent:", PLAYER_ENTRY)
-            t7 = []                                         # temp [] for scaning each players data
-            print ("Squad member: ", end="")
-            for player_num in range (0, 15):                # note: hard-coded 14 players in a team
-                print (player_num, end="")                  # python3 formatted
-                print (".", end="" )
-                t7 = self.t3[player_num]                    # temp [] dict to scan squad players
-
-                if t7['is_captain'] is True:                # setting player type in prep for MongoDB inserts
-                   player_type = "Captain"
-                elif t7['is_vice_captain'] is True:
-                   player_type = "Vice captain"
-                else:
-                   player_type = "Regular player"
-
-                #print ("get_opponents_squad(): Team:", t1['entry'], "Week:", \
-                #        t2['id'], "Player:", t7['element'], "Position:", \
-                #        t7['position'], "Player_type:", player_type)
-
-                result = col_2.insert({ "Team": t1['entry'], \
-                        "week": t2['id'], \
-                        "Player": t7['element'], \
-                        "Position": t7['position'], \
-                        "Player_type": player_type })
-            return
-        else:
-            print ( "Can't insert data into MongoDB due to HTML get failure" )
-        return
-
+# Class methods
 
     def opp_squad_captain(self):
         """extract info about the captain of this oponents squad"""
@@ -211,3 +198,43 @@ class get_opponents_squad:
                 pass        # keep scanning...
 
         return 0            # did not find player in opponents squad
+
+    def opp_squad_dbload(self):
+        """ load some of an opponents squad data into a MongoDB """
+
+        if self.gotdata_status == 200:                          # read of data set
+            logging.info('get_opponents_squad():: opp_squad_dbload() - Squad data sucessfull extracted')
+            logging.info('get_opponents_squad():: opp_squad_dbload() - API URL: %s' % resp4.request.url)
+
+            logging.info('get_opponents_squad():: opp_squad_dbload() - mongoDB col inserts: eplopsquad_ML')
+            mclient = MongoClient("mongodb://admin:sanfran1@localhost/admin")
+            db = mclient.test1
+            col_2 = db.eplopsquad_ML
+            print ("Insert week", str(event_id), "squad player/position data for oponent:", PLAYER_ENTRY)
+            t7 = []                                         # temp [] for scaning each players data
+            print ("Squad member: ", end="")
+            for player_num in range (0, 15):                # note: hard-coded 14 players in a team
+                print (player_num, end="")                  # python3 formatted
+                print (".", end="" )
+                t7 = self.t3[player_num]                    # temp [] dict to scan squad players
+
+                if t7['is_captain'] is True:                # setting player type in prep for MongoDB inserts
+                   player_type = "Captain"
+                elif t7['is_vice_captain'] is True:
+                   player_type = "Vice captain"
+                else:
+                   player_type = "Regular player"
+
+                #print ("get_opponents_squad(): Team:", t1['entry'], "Week:", \
+                #        t2['id'], "Player:", t7['element'], "Position:", \
+                #        t7['position'], "Player_type:", player_type)
+
+                result = col_2.insert({ "Team": t1['entry'], \
+                        "week": t2['id'], \
+                        "Player": t7['element'], \
+                        "Position": t7['position'], \
+                        "Player_type": player_type })
+            return
+        else:
+            print ( "Can't insert data into MongoDB due to HTML get failure" )
+        return
