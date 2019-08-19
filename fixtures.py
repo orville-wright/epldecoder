@@ -35,11 +35,10 @@ class allfixtures:
     """So it doesn't require any auth"""
 
     # Class Global attributes
-    username = ""
-    password = ""
     current_event = ""
     api_get_status = ""
     standings_t = ""
+    bootstrap = ""
 
     def __init__(self, playerid, bootstrapdb, eventnum):
 
@@ -47,6 +46,7 @@ class allfixtures:
         self.eventnum = str(eventnum)
         self.playeridnum = playerid
         logging.info('allfixtures:: - create fixtures class instance for gameweek: %s' % self.eventnum )
+        allfixtures.bootstrap = bootstrapdb
 
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
@@ -119,7 +119,8 @@ class allfixtures:
         """its just a quick way to  what fixtures are approaching in the near future"""
 
         logging.info('allfixtures:: upcomming_fixtures() - init' )
-        tn_idx = fpl_bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
+        tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
+        #tn_idx = self.bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
         print ( "Next 10 fixtures..." )
         for fixture in self.next_event_fixtures:    # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
@@ -160,8 +161,10 @@ class allfixtures:
         self.regular_season_a = self.standings[2]    # standings away
         self.standings_t_table = self.regular_season_t['table']    # data
         self.standings_h_table = self.regular_season_h['table']    # data
-        self.standings_a_table = self.regular_season_h['table']    # data
+        self.standings_a_table = self.regular_season_a['table']    # data
 
-        fpl_bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
-        print ("GET_STANDINGS:", self.standings_t )          # JSON dataset
+        self.bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
+        #print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
+        #print ("REGULAR_SEASON:", self.regular_season_t )
+        #return self.regular_season_t
         return

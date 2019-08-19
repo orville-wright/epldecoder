@@ -260,7 +260,9 @@ def main():
     print ( " " )
     print ( "======================== Fixtures ========================" )
     these_fixtures = allfixtures(i_am.playeridnum, bootstrap, player_entry.current_event )
+
     these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
+    #fpl_bootstrap.standings_t = these_fixtures.get_standings()    # update standings dataset. save standings as class gloabl accessor
     these_fixtures.upcomming_fixtures()
 
     # bootstrap.game_decisions(328, 338)    # no longer makes sense
