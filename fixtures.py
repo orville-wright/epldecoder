@@ -139,7 +139,7 @@ class allfixtures:
             #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
-            print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
+            print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], idx_h, "vs.", self.bootstrap.epl_team_names[idx_a], idx_a, "(AWAY)" )
 #            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
 
             #print ( "Gameplay decison: ", end="" )
@@ -173,7 +173,6 @@ class allfixtures:
         self.bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
         #print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
         #print ("REGULAR_SEASON:", self.regular_season_t )
-        #return self.regular_season_t
         return
 
     def game_decisions(self, team_h, team_a):
@@ -188,12 +187,14 @@ class allfixtures:
 
         #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
         # tuple: very fast but immutable : foorball-data.com-teamID, epl-teamid, bootstrap-teamid
+        #
+        # table delow is only relevent for 2019/2020 season - 3rd field changes at beginnning of each season
         self.teamid_xlt = ( \
                         57, 3, 1, \
                         1044, 7, 2, \
                         328, 91, 3, \
                         397, 36, 4, \
-                        ???, 90, 5, \ *
+                        328, 90, 5, \
                         61, 8, 6, \
                         354, 31, 7, \
                         62, 11, 8, \
@@ -202,8 +203,8 @@ class allfixtures:
                         65, 43, 11, \
                         66, 1, 12, \
                         67, 4, 13, \
-                        ???, 45, 14, \
-                        ???, 49, 15, \
+                        68, 45, 14, \
+                        356, 49, 15, \
                         340, 20, 16, \
                         73, 6, 17, \
                         346, 57, 18, \
@@ -224,7 +225,7 @@ class allfixtures:
         # method of fpl_bootstrap.game_decisions()
     def team_finder(self, tf):
         self.tf = tf
-        logging.info('game_decisions.team_finder() - init %s' % self.tf )
+        logging.info('allfixtures.team_finder() - init %s' % self.tf )
         for tx in range (0, 59, 3):    # 20 teams x 3 tuplr elements per team
             if self.teamid_xlt[tx+2] == self.tf:
                 a = self.teamid_xlt[tx]
@@ -257,7 +258,7 @@ class allfixtures:
                 #if teamid_xlt[tx+2] == team_h:
                 #home_team = teamid_xlt[tx]
                 # print ( "Team: ", self.epl_team_names[self.se_ts], end="" )    # use EPL bootstrap team NAMES
-                print ( "Team: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
+                print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
                 print ( "Ranked: ", pos+1, " ", end="" )
                 print ( "GF: ", stp_gf, " ", end="" )
                 print ( "GA: ", stp_ga, " ", end="" )
