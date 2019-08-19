@@ -35,18 +35,19 @@ class allfixtures:
     """So it doesn't require any auth"""
 
     # Class Global attributes
-    current_event = ""
+    this_event = ""
     api_get_status = ""
     standings_t = ""
     bootstrap = ""
 
     def __init__(self, playerid, bootstrapdb, eventnum):
 
-        allfixtures.bootstrapdb = bootstrapdb
         self.eventnum = str(eventnum)
         self.playeridnum = playerid
         logging.info('allfixtures:: - create fixtures class instance for gameweek: %s' % self.eventnum )
+
         allfixtures.bootstrap = bootstrapdb
+        allfixtures.this_event = self.eventnum
 
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
@@ -103,7 +104,11 @@ class allfixtures:
             # EXTRACT JSON data/fields...
             # note: entry[] and player[] are not auto loaded when dataset lands (not sure why)
             t0 = json.loads(rx1.text)
-            self.fixtures = t0
+            self.fixtures = t0    # entire JSON dict - process current event (could be past/present/future)
+            #for XX in range (0..9):
+
+            #print ("JSON ARRAY DUMP:", t0[0] )
+            #print ("ALL FIXTURES FOR CURRENT WEEK NUM:", t0)
             #self.game_settings = t0['game_settings']
             #self.phases = t0['phases']
             #self.teams = t0['teams']                    # All details of EPL teams in Premieership league this year
@@ -115,14 +120,16 @@ class allfixtures:
 #######################
 
     def upcomming_fixtures(self):
-        """the bootstrap database holds a list of the next 10 gameweek fixtures"""
-        """its just a quick way to  what fixtures are approaching in the near future"""
+        """Fixtures are messy in the main JSON data model"""
+        """There is no simple & readily accessible database that qwuicly available."""
+        """You have to build/interrogate your list of fixtures every time"""
 
+#       This JSON structure was destroyed in the 2019/2020 season changes.
         logging.info('allfixtures:: upcomming_fixtures() - init' )
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
         #tn_idx = self.bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
-        print ( "Next 10 fixtures..." )
-        for fixture in self.next_event_fixtures:    # BROKEN by 2019/2020 JSON changes
+        print ( "SHow fixtures for gameweek...", self.eventnum )
+        for fixture in self.fixtures:    # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
 # do some analytics on fixtures...
@@ -132,7 +139,9 @@ class allfixtures:
             #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
-            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time_formatted'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
+            print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
+#            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
+
             #print ( "Gameplay decison: ", end="" )
             self.game_decisions(idx_h, idx_a)
             #print ( "Home team:", self.epl_team_names[idx_h] )
@@ -149,9 +158,7 @@ class allfixtures:
         headers = { 'X-Auth-Token': '01232ee1842c428291d3a04091e25916' }              # my private API token (throtteled @ 10 calls/min)
         connection.request('GET', '/v2/competitions/PL/standings', None, headers )    # EPL standings
         t1 = json.loads(connection.getresponse().read().decode())
-        #print (t1)
         logging.info('allfixtures:: get_standings() - init')
-        #    t1 = json.loads(rx1.text)
         self.filters = t1['filters']
         self.competition = t1['competition']
         self.season = t1['season']
@@ -167,4 +174,99 @@ class allfixtures:
         #print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
         #print ("REGULAR_SEASON:", self.regular_season_t )
         #return self.regular_season_t
+        return
+
+    def game_decisions(self, team_h, team_a):
+        logging.info('allfixtures:: game_decisions() - init ' )
+        self.team_h = team_h
+        self.team_a = team_a
+        self.temp_idx = ""    # temp var populated by return from team_finder()
+        #self.get_standings()         # allways make sure league standings is updated/current before we start
+        # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
+        # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
+        # elements - 0 = www://football-data.org , 1 = www://fantasy.premierleague.com
+
+        #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
+        # tuple: very fast but immutable : foorball-data.com-teamID, epl-teamid, bootstrap-teamid
+        self.teamid_xlt = ( \
+                        57, 3, 1, \
+                        1044, 7, 2, \
+                        328, 91, 3, \
+                        397, 36, 4, \
+                        ???, 90, 5, \ *
+                        61, 8, 6, \
+                        354, 31, 7, \
+                        62, 11, 8, \
+                        338, 13, 9, \
+                        64, 14, 10, \
+                        65, 43, 11, \
+                        66, 1, 12, \
+                        67, 4, 13, \
+                        ???, 45, 14, \
+                        ???, 49, 15, \
+                        340, 20, 16, \
+                        73, 6, 17, \
+                        346, 57, 18, \
+                        563, 21, 19, \
+                        76, 39, 20)
+
+        logging.info('game_decisions:: finding home team - %s' % self.team_h )
+        home = self.team_finder(self.team_h)
+        logging.info('game_decisions:: Home team tuple code - %s' % home )
+
+        logging.info('game_decisions:: finding away team - %s' % self.team_a )
+        away = self.team_finder(self.team_a)
+        logging.info('game_decisions:: Away team tuple code - %s'% away )
+        self.standings_extractor(home)
+        self.standings_extractor(away)
+        return
+
+        # method of fpl_bootstrap.game_decisions()
+    def team_finder(self, tf):
+        self.tf = tf
+        logging.info('game_decisions.team_finder() - init %s' % self.tf )
+        for tx in range (0, 59, 3):    # 20 teams x 3 tuplr elements per team
+            if self.teamid_xlt[tx+2] == self.tf:
+                a = self.teamid_xlt[tx]
+                # game_decisions.temp_idx = ?????
+                # b = self.teamid_xlt[tx+1]
+                return a    # football-data_teamID, EPL_teamID
+            else:
+                pass    # keep looking for this team in tuple
+        return
+
+    def standings_extractor(self, ts):
+        self.se_ts = ts
+        logging.info('game_decisions.standings_extractor() - init %s' % self.se_ts )
+        standings = []
+        standings = self.bootstrap.standings_t       # load latest league standings
+        standings_table = standings['table']    # a single JSON []array with all 20 teams
+        for pos in range (0, 20):
+            stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
+            stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
+            stp_teamid = stp['team']['id']
+            stp_pg = stp['playedGames']         # number of games played
+            stp_w = stp['won']
+            stp_d = stp['draw']
+            stp_l = stp['lost']
+            stp_pts = stp['points']
+            stp_gf = stp['goalsFor']
+            stp_ga = stp['goalsAgainst']
+            stp_gd = stp['goalDifference']
+            if stp_teamid == self.se_ts:
+                #if teamid_xlt[tx+2] == team_h:
+                #home_team = teamid_xlt[tx]
+                # print ( "Team: ", self.epl_team_names[self.se_ts], end="" )    # use EPL bootstrap team NAMES
+                print ( "Team: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
+                print ( "Ranked: ", pos+1, " ", end="" )
+                print ( "GF: ", stp_gf, " ", end="" )
+                print ( "GA: ", stp_ga, " ", end="" )
+                print ( "GD: ", stp_gd)
+            else:
+                pass
+
+            #game_delta = pos - pos
+            #gd_delta = stp_gd - stp_gd
+            #best_game = game_delta*gd_delta
+            #print ( "POS: ", pos+1, " ", stp_team, "API ID: ", stp_teamid, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
         return
