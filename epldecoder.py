@@ -262,7 +262,10 @@ def main():
     next_event = player_entry.current_event + 1
     these_fixtures = allfixtures(i_am.playeridnum, bootstrap, next_event )
     these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
-    these_fixtures.upcomming_fixtures()
+    these_fixtures.upcomming_fixtures(0)    # 0 = NO, 1 = YES, do datascience anqalytics on fixtures
+    print ( " " )
+    print ("Fixture analytics..." )
+    these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES, do datascience anqalytics on fixtures
 
     # bootstrap.game_decisions(328, 338)    # no longer makes sense
 

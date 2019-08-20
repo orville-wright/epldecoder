@@ -119,16 +119,17 @@ class allfixtures:
 
 #######################
 
-    def upcomming_fixtures(self):
+    def upcomming_fixtures(self, ds_yes_no):
         """Fixtures are messy in the main JSON data model"""
         """There is no simple & readily accessible database that qwuicly available."""
         """You have to build/interrogate your list of fixtures every time"""
 
 #       This JSON structure was destroyed in the 2019/2020 season changes.
-        logging.info('allfixtures:: upcomming_fixtures() - init' )
+        self.datasci = ds_yes_no
+        logging.info('allfixtures:: upcomming_fixtures() - init : %s' % ds_yes_no )
+
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
-        #tn_idx = self.bootstrap.list_epl_teams(self)    # build my nice helper team id/real name dict
-        print ( "SHow fixtures for gameweek...", self.eventnum )
+        print ( "Show fixtures for gameweek...", self.eventnum )
         for fixture in self.fixtures:    # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
@@ -139,15 +140,19 @@ class allfixtures:
             #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
             #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
-            print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], idx_h, "vs.", self.bootstrap.epl_team_names[idx_a], idx_a, "(AWAY)" )
+            print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
 #            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
 
             #print ( "Gameplay decison: ", end="" )
-            self.game_decisions(idx_h, idx_a)
-            #print ( "Home team:", self.epl_team_names[idx_h] )
-            #print ( "Away team:", self.epl_team_names[idx_a] )
-            #print ( "Home team:", idx_h )
-            #print ( "Away team:", idx_a )
+            if self.datasci == 1:    # 1 = do deep datascience analytics on fixtures
+                self.game_decisions(idx_h, idx_a)    # run seperately for each game match
+                #print ( "Home team:", self.epl_team_names[idx_h] )
+                #print ( "Away team:", self.epl_team_names[idx_a] )
+                #print ( "Home team:", idx_h )
+                #print ( "Away team:", idx_a )
+            else:
+                pass
+
         return
 
     def get_standings(self):
@@ -176,6 +181,12 @@ class allfixtures:
         return
 
     def game_decisions(self, team_h, team_a):
+        """Method to manage the proprietary ID mappings between different datasets"""
+        """prodived by football differnt data/api websites."""
+        """Team ID's are not consistent across differnt websites/api's. This fixes that issue."""
+
+# currently....
+# This method only provided visual output. It doesn't populate any new dicts/arrays."
         logging.info('allfixtures:: game_decisions() - init ' )
         self.team_h = team_h
         self.team_a = team_a
@@ -211,22 +222,21 @@ class allfixtures:
                         563, 21, 19, \
                         76, 39, 20)
 
-        logging.info('game_decisions:: finding home team - %s' % self.team_h )
+        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
         home = self.team_finder(self.team_h)
-        logging.info('game_decisions:: Home team tuple code - %s' % home )
+        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
 
-        logging.info('game_decisions:: finding away team - %s' % self.team_a )
+        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
         away = self.team_finder(self.team_a)
-        logging.info('game_decisions:: Away team tuple code - %s'% away )
+        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
         self.standings_extractor(home)
         self.standings_extractor(away)
         return
 
-        # method of fpl_bootstrap.game_decisions()
     def team_finder(self, tf):
         self.tf = tf
-        logging.info('allfixtures.team_finder() - init %s' % self.tf )
-        for tx in range (0, 59, 3):    # 20 teams x 3 tuplr elements per team
+        logging.info('allfixtures::team_finder() - init %s' % self.tf )
+        for tx in range (0, 59, 3):    # 20 teams x 3 tupl elements per team
             if self.teamid_xlt[tx+2] == self.tf:
                 a = self.teamid_xlt[tx]
                 # game_decisions.temp_idx = ?????
@@ -237,8 +247,11 @@ class allfixtures:
         return
 
     def standings_extractor(self, ts):
-        self.se_ts = ts
-        logging.info('game_decisions.standings_extractor() - init %s' % self.se_ts )
+        """method to extract the standings details for ONE specific team"""
+        """as that team is currently ranked in the overall current table"""
+
+        self.se_ts = ts    # this is the  team I am intersted in
+        logging.info('allfixtures::standings_extractor() - init %s' % self.se_ts )
         standings = []
         standings = self.bootstrap.standings_t       # load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
