@@ -280,7 +280,7 @@ class allfixtures:
                 print ( "GA: ", stp_ga, " ", end="" )
                 print ( "GD: ", stp_gd)
                 # create a tuple on the fly, with all key data science data in it
-                dst_idx = 'ds_tuple_' + stp_teamid
+                dst_idx = 'ds_tuple_' + str(stp_teamid)
                 dst_idx = ()
                 dst_idx = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
             else:
