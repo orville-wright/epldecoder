@@ -181,25 +181,39 @@ class allfixtures:
         return
 
     def game_decisions(self, team_h, team_a):
-        """Method to manage the proprietary ID mappings between different datasets"""
-        """prodived by football differnt data/api websites."""
-        """Team ID's are not consistent across differnt websites/api's. This fixes that issue."""
+        """Datascience control logic for fixtures analytics and decisions"""
 
-# currently....
-# This method only provided visual output. It doesn't populate any new dicts/arrays."
         logging.info('allfixtures:: game_decisions() - init ' )
         self.team_h = team_h
         self.team_a = team_a
         self.temp_idx = ""    # temp var populated by return from team_finder()
         #self.get_standings()         # allways make sure league standings is updated/current before we start
-        # thhis dict is needed becasue we are using mukltiple API's as data sources & those API's do *NOT*
-        # use a standardized ID_number to represent each team. - (must be updated @ start of each season).
-        # elements - 0 = www://football-data.org , 1 = www://fantasy.premierleague.com
 
-        #WARNING: *** EPL doesnt use teamID much. it uses team code (which is int(index) in its JSON struct )
+        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
+        home = self.team_finder(self.team_h)
+        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
+
+        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
+        away = self.team_finder(self.team_a)
+        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
+        self.standings_extractor(home)
+        self.standings_extractor(away)
+        return
+
+    def team_finder(self, tf):
+        """Helper moethod to decode & xref team ID's across multile API's"""
+        """across multiple API web services"""
+
+        # we now utilize mukltiple API's as data sources & those API's do *NOT* use a
+        # standardized ID_number for each team. - (must be updated @ start of each season.
+        # 0 = www://football-data.org TEAM ID code - (immutable for ever)
+        # 1 = www://fantasy.premierleague.com TEAM ID code - (immutable for ever)
+        # 2 = www://fantasy.premierleague.com  TEAM ID index for this season (changes every season)
+
+        # WARNING: fantasy.EPL doesnt use teamID much. it uses team index (which is int(index) in its JSON )
         # tuple: very fast but immutable : foorball-data.com-teamID, epl-teamid, bootstrap-teamid
         #
-        # table delow is only relevent for 2019/2020 season - 3rd field changes at beginnning of each season
+        # table delow is only relevent for 2019/2020 season
         self.teamid_xlt = ( \
                         57, 3, 1, \
                         1044, 7, 2, \
@@ -221,26 +235,11 @@ class allfixtures:
                         346, 57, 18, \
                         563, 21, 19, \
                         76, 39, 20)
-
-        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
-        home = self.team_finder(self.team_h)
-        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
-
-        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
-        away = self.team_finder(self.team_a)
-        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
-        self.standings_extractor(home)
-        self.standings_extractor(away)
-        return
-
-    def team_finder(self, tf):
         self.tf = tf
         logging.info('allfixtures::team_finder() - init %s' % self.tf )
         for tx in range (0, 59, 3):    # 20 teams x 3 tupl elements per team
             if self.teamid_xlt[tx+2] == self.tf:
                 a = self.teamid_xlt[tx]
-                # game_decisions.temp_idx = ?????
-                # b = self.teamid_xlt[tx+1]
                 return a    # football-data_teamID, EPL_teamID
             else:
                 pass    # keep looking for this team in tuple
