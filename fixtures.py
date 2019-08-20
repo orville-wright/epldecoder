@@ -134,8 +134,8 @@ class allfixtures:
         for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # index is Unique Team ID, element = tupple
-            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # index is Unique Team ID, element = tupple
+            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # index = Unique Team ID, element = tupple
+            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # index = Unique Team ID, element = tupple
 # do some analytics on fixtures...
             #h_rank
             #a_rank
@@ -279,6 +279,9 @@ class allfixtures:
                 print ( "GF: ", stp_gf, " ", end="" )
                 print ( "GA: ", stp_ga, " ", end="" )
                 print ( "GD: ", stp_gd)
+                # create a tuple on the fly, with all key data science data in it
+                ds_tuple = ds_tuple + '_' + stp_teamid
+                ds_tuple = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
             else:
                 pass
 
