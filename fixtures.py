@@ -126,13 +126,16 @@ class allfixtures:
 
 #       This JSON structure was destroyed in the 2019/2020 season changes.
         self.datasci = ds_yes_no
+        self.ds_fixtures = {}        # dict to hold fixtures to analyze
         logging.info('allfixtures:: upcomming_fixtures() - init : %s' % ds_yes_no )
 
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
         print ( "Show fixtures for gameweek...", self.eventnum )
-        for fixture in self.fixtures:    # BROKEN by 2019/2020 JSON changes
+        for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
+            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # index is Unique Team ID, element = tupple
+            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # index is Unique Team ID, element = tupple
 # do some analytics on fixtures...
             #h_rank
             #a_rank
@@ -164,6 +167,7 @@ class allfixtures:
         connection.request('GET', '/v2/competitions/PL/standings', None, headers )    # EPL standings
         t1 = json.loads(connection.getresponse().read().decode())
         logging.info('allfixtures:: get_standings() - init')
+        # quickly addressible elements
         self.filters = t1['filters']
         self.competition = t1['competition']
         self.season = t1['season']
