@@ -134,8 +134,8 @@ class allfixtures:
         for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # index = Unique Team ID, element = tupple
-            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # index = Unique Team ID, element = tupple
+            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # !! might be better place to do this - index = Unique Team ID, element = tupple
+            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # !! might be better place to do this - index = Unique Team ID, element = tupple
 # do some analytics on fixtures...
             #h_rank
             #a_rank
@@ -180,7 +180,7 @@ class allfixtures:
         self.standings_a_table = self.regular_season_a['table']    # data
 
         self.bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
-        #print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
+        # print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
         #print ("REGULAR_SEASON:", self.regular_season_t )
         return
 
@@ -220,8 +220,8 @@ class allfixtures:
         # table delow is only relevent for 2019/2020 season
         self.teamid_xlt = ( \
                         57, 3, 1, \
-                        1044, 7, 2, \
-                        328, 91, 3, \
+                        58, 7, 2, \
+                        1044, 91, 3, \
                         397, 36, 4, \
                         328, 90, 5, \
                         61, 8, 6, \
@@ -242,7 +242,7 @@ class allfixtures:
         self.tf = tf
         logging.info('allfixtures::team_finder() - init %s' % self.tf )
         for tx in range (0, 59, 3):    # 20 teams x 3 tupl elements per team
-            if self.teamid_xlt[tx+2] == self.tf:
+            if self.teamid_xlt[tx+2] == self.tf:        # testing on fantasy.epl team ID
                 a = self.teamid_xlt[tx]
                 return a    # football-data_teamID, EPL_teamID
             else:
@@ -253,7 +253,7 @@ class allfixtures:
         """method to extract the standings details for ONE specific team"""
         """as that team is currently ranked in the overall current table"""
 
-        self.se_ts = ts    # this is the  team I am intersted in
+        self.se_ts = ts    # team I am intersted in
         logging.info('allfixtures::standings_extractor() - init %s' % self.se_ts )
         standings = []
         standings = self.bootstrap.standings_t       # load latest league standings
@@ -281,6 +281,7 @@ class allfixtures:
                 print ( "GD: ", stp_gd)
                 # create a tuple on the fly, with all key data science data in it
                 dst_idx = 'ds_tuple_' + str(stp_teamid)
+                print ( "Building TUPLE name:", dst_idx )
                 dst_idx = ()
                 dst_idx = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
             else:
