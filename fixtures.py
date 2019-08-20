@@ -282,7 +282,7 @@ class allfixtures:
                 # create a tuple on the fly, with all key data science data in it
                 dst_idx = 'ds_tuple_' + stp_teamid
                 dst_idx = ()
-                ds_idx = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
+                dst_idx = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
             else:
                 pass
 
