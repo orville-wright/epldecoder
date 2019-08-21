@@ -200,13 +200,24 @@ class allfixtures:
         logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
         away = self.team_finder(self.team_a)
         logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
-        self.standings_extractor(home)
-        self.standings_extractor(away)
+        ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
+        ds_data_away = self.standings_extractor(away)    # ditto
+        # teamid, team_full_name, ranking_pos, gf, ga, gd)
+        ranking_mismatch = ds_data_home[2] - ds_data_away[2]
+        goal_diff_delta = ds_data_home[5] - ds_data_away[5]
+        gf_delta = ds_data_home[3] - ds_data_away[3]
+        ga_delta = ds_data_home[4] - ds_data_away[4]
+        game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * abs(ga_delta)
+
+        print ("\tLogic - ", "Table pos diff:", abs(ranking_mismatch), "Goal diff:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", abs(ga_delta), "Weighting:", game_weight )
+        print (" ")
         return
 
     def team_finder(self, tf):
         """Helper moethod to decode & xref team ID's across multile API's"""
         """across multiple API web services"""
+        """call : method with fantas.epl TEAM ID"""
+        """Returns : football-data.org TEAM ID"""
 
         # we now utilize mukltiple API's as data sources & those API's do *NOT* use a
         # standardized ID_number for each team. - (must be updated @ start of each season.
@@ -271,24 +282,17 @@ class allfixtures:
             stp_ga = stp['goalsAgainst']
             stp_gd = stp['goalDifference']
             if stp_teamid == self.se_ts:
-                #if teamid_xlt[tx+2] == team_h:
-                #home_team = teamid_xlt[tx]
-                # print ( "Team: ", self.epl_team_names[self.se_ts], end="" )    # use EPL bootstrap team NAMES
                 print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
                 print ( "Ranked: ", pos+1, " ", end="" )
                 print ( "GF: ", stp_gf, " ", end="" )
                 print ( "GA: ", stp_ga, " ", end="" )
                 print ( "GD: ", stp_gd)
                 # create a tuple on the fly, with all key data science data in it
-                dst_idx = 'ds_tuple_' + str(stp_teamid)
-                print ( "Building TUPLE name:", dst_idx )
-                dst_idx = ()
-                dst_idx = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
+                ds_data = 'dsd_' + str(stp_teamid)
+                # print ( "Building TUPLE name:", ds_data )
+                ds_data = ()
+                ds_data = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
             else:
                 pass
 
-            #game_delta = pos - pos
-            #gd_delta = stp_gd - stp_gd
-            #best_game = game_delta*gd_delta
-            #print ( "POS: ", pos+1, " ", stp_team, "API ID: ", stp_teamid, "Points: ", stp_pts, "Games played: ", stp_pg, "Goal Diff: ", stp_gd)
-        return
+        return ds_data    # tuple containg data science ready data
