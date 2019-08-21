@@ -158,6 +158,39 @@ class allfixtures:
 
         return
 
+    def game_decisions(self, team_h, team_a):
+        """Datascience control logic for fixtures analytics and decisions"""
+
+        logging.info('allfixtures:: game_decisions() - init ' )
+        self.team_h = team_h
+        self.team_a = team_a
+        self.temp_idx = ""    # temp var populated by return from team_finder()
+        #self.get_standings()         # allways make sure league standings is updated/current before we start
+
+        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
+        home = self.team_finder(self.team_h)
+        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
+
+        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
+        away = self.team_finder(self.team_a)
+        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
+        ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
+        ds_data_away = self.standings_extractor(away)    # ditto
+        # teamid, team_full_name, ranking_pos, gf, ga, gd)
+        ranking_mismatch = ds_data_home[2] - ds_data_away[2]
+        goal_diff_delta = ds_data_home[5] - ds_data_away[5]
+        gf_delta = ds_data_home[3] - ds_data_away[3]
+
+        ga_dxa = ds_data_home[4] + ds_data_away[4]
+        ga_dxb = int(allfixtures.this_event)
+        ga_delta = round(abs(ga_dxa/ga_dxb))
+        game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * ga_delta
+        game_tag = str(self.team_h) + '_vs_' + str(self.team_a)
+        print ("\tLogic - ", "Pos delta:", abs(ranking_mismatch), "GD delta:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", ga_delta, "Weighting:", game_weight )
+        print ("\t", game_tag, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight )
+        print (" ")
+        return
+
     def get_standings(self):
         """Create a full current league standings database & make avail in gloabl bootstrap instance"""
         """uses https://www.football-data.org API (my free throttled/limited API account """
@@ -184,34 +217,42 @@ class allfixtures:
         #print ("REGULAR_SEASON:", self.regular_season_t )
         return
 
-    def game_decisions(self, team_h, team_a):
-        """Datascience control logic for fixtures analytics and decisions"""
+    def standings_extractor(self, ts):
+        """method to extract the standings details for ONE specific team"""
+        """as that team is currently ranked in the overall current table"""
 
-        logging.info('allfixtures:: game_decisions() - init ' )
-        self.team_h = team_h
-        self.team_a = team_a
-        self.temp_idx = ""    # temp var populated by return from team_finder()
-        #self.get_standings()         # allways make sure league standings is updated/current before we start
+        self.se_ts = ts    # team I am intersted in
+        logging.info('allfixtures::standings_extractor() - init %s' % self.se_ts )
+        standings = []
+        standings = self.bootstrap.standings_t       # load latest league standings
+        standings_table = standings['table']    # a single JSON []array with all 20 teams
+        for pos in range (0, 20):
+            stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
+            stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
+            stp_teamid = stp['team']['id']
+            stp_pg = stp['playedGames']         # number of games played
+            stp_w = stp['won']
+            stp_d = stp['draw']
+            stp_l = stp['lost']
+            stp_pts = stp['points']
+            stp_gf = stp['goalsFor']
+            stp_ga = stp['goalsAgainst']
+            stp_gd = stp['goalDifference']
+            if stp_teamid == self.se_ts:
+                print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
+                print ( "Ranked: ", pos+1, " ", end="" )
+                print ( "GF: ", stp_gf, " ", end="" )
+                print ( "GA: ", stp_ga, " ", end="" )
+                print ( "GD: ", stp_gd)
+                # create a tuple on the fly, with all key data science data in it
+                ds_data = 'dsd_' + str(stp_teamid)
+                # print ( "Building TUPLE name:", ds_data )
+                ds_data = ()
+                ds_data = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
+            else:
+                pass
 
-        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
-        home = self.team_finder(self.team_h)
-        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
-
-        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
-        away = self.team_finder(self.team_a)
-        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
-        ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
-        ds_data_away = self.standings_extractor(away)    # ditto
-        # teamid, team_full_name, ranking_pos, gf, ga, gd)
-        ranking_mismatch = ds_data_home[2] - ds_data_away[2]
-        goal_diff_delta = ds_data_home[5] - ds_data_away[5]
-        gf_delta = ds_data_home[3] - ds_data_away[3]
-        ga_delta = ds_data_home[4] - ds_data_away[4]
-        game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * abs(ga_delta)
-
-        print ("\tLogic - ", "Table pos diff:", abs(ranking_mismatch), "Goal diff:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", abs(ga_delta), "Weighting:", game_weight )
-        print (" ")
-        return
+        return ds_data    # tuple containg data science ready data
 
     def team_finder(self, tf):
         """Helper moethod to decode & xref team ID's across multile API's"""
@@ -259,40 +300,3 @@ class allfixtures:
             else:
                 pass    # keep looking for this team in tuple
         return
-
-    def standings_extractor(self, ts):
-        """method to extract the standings details for ONE specific team"""
-        """as that team is currently ranked in the overall current table"""
-
-        self.se_ts = ts    # team I am intersted in
-        logging.info('allfixtures::standings_extractor() - init %s' % self.se_ts )
-        standings = []
-        standings = self.bootstrap.standings_t       # load latest league standings
-        standings_table = standings['table']    # a single JSON []array with all 20 teams
-        for pos in range (0, 20):
-            stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
-            stp_team = stp['team']['name']      # sub array with 3 data members (id, name, crestUrl)
-            stp_teamid = stp['team']['id']
-            stp_pg = stp['playedGames']         # number of games played
-            stp_w = stp['won']
-            stp_d = stp['draw']
-            stp_l = stp['lost']
-            stp_pts = stp['points']
-            stp_gf = stp['goalsFor']
-            stp_ga = stp['goalsAgainst']
-            stp_gd = stp['goalDifference']
-            if stp_teamid == self.se_ts:
-                print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
-                print ( "Ranked: ", pos+1, " ", end="" )
-                print ( "GF: ", stp_gf, " ", end="" )
-                print ( "GA: ", stp_ga, " ", end="" )
-                print ( "GD: ", stp_gd)
-                # create a tuple on the fly, with all key data science data in it
-                ds_data = 'dsd_' + str(stp_teamid)
-                # print ( "Building TUPLE name:", ds_data )
-                ds_data = ()
-                ds_data = (stp_teamid, stp_team, pos+1, stp_gf, stp_ga, stp_gd)
-            else:
-                pass
-
-        return ds_data    # tuple containg data science ready data
