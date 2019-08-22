@@ -193,17 +193,17 @@ class allfixtures:
         print ("\t", "[[", self.team_h, ",", home_team, ",", self.team_a, ",", away_team, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight, "]]" )
         print (" ")
         print ("\t", \
-                        "data", ",", \
-                        self.team_h, ",", \
-                        home_team, ",", \
-                        self.team_a, ",", \
-                        away_team, ",", \
-                        abs(ranking_mismatch), ",", \
-                        abs(goal_diff_delta), ",", \
-                        abs(gf_delta), ",", \
-                        ga_delta, ",", \
-                        game_weight, \
-                        index=[game_tag] )
+                    "data", ",", \
+                    self.team_h, ",", \
+                    home_team, ",", \
+                    self.team_a, ",", \
+                    away_team, ",", \
+                    abs(ranking_mismatch), ",", \
+                    abs(goal_diff_delta), ",", \
+                    abs(gf_delta), ",", \
+                    ga_delta, ",", \
+                    game_weight, \
+                    index=[game_tag] )
 
         return
 
