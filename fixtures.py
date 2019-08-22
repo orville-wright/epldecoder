@@ -4,6 +4,7 @@ from requests import Request, Session
 import json
 import logging
 import http.client
+import pandas as pd
 
 # logging setup
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +40,8 @@ class allfixtures:
     api_get_status = ""
     standings_t = ""
     bootstrap = ""
+    ds_df0 = ""
+
 
     def __init__(self, playerid, bootstrapdb, eventnum):
 
@@ -48,7 +51,8 @@ class allfixtures:
 
         allfixtures.bootstrap = bootstrapdb
         allfixtures.this_event = self.eventnum
-
+        # create an empty pandas DataFrame with specific column names pre-defined
+        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'] )
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
@@ -126,7 +130,6 @@ class allfixtures:
 
 #       This JSON structure was destroyed in the 2019/2020 season changes.
         self.datasci = ds_yes_no
-        self.ds_fixtures = {}        # dict to hold fixtures to analyze
         logging.info('allfixtures:: upcomming_fixtures() - init : %s' % ds_yes_no )
 
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
@@ -134,28 +137,17 @@ class allfixtures:
         for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-            self.ds_fixtures[idx_h] = "ready for HOME tupple"    # !! might be better place to do this - index = Unique Team ID, element = tupple
-            self.ds_fixtures[idx_a] = "ready for AWAY tupple"    # !! might be better place to do this - index = Unique Team ID, element = tupple
 # do some analytics on fixtures...
-            #h_rank
-            #a_rank
-            #rank_missmatch = h_rank - a_rank    # bigger number = large disparity, more probability of big scoring game
-            #h_gdiff   - noit stored anywhere in bootstrap JSON datatset
-            #a_gdiff   - noit stored anywhere in bootstrap JSON datatset
-            #gd_missmatch = h_gdiff - a_gdiff    # bigger delta = larg disparity, team are more missmatched in scoring/skill/power
             print ( "GW:", fixture['event'], fixture['kickoff_time'], ") HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
-#            print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
+            # print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
 
             #print ( "Gameplay decison: ", end="" )
             if self.datasci == 1:    # 1 = do deep datascience analytics on fixtures
                 self.game_decisions(idx_h, idx_a)    # run seperately for each game match
-                #print ( "Home team:", self.epl_team_names[idx_h] )
-                #print ( "Away team:", self.epl_team_names[idx_a] )
-                #print ( "Home team:", idx_h )
-                #print ( "Away team:", idx_a )
             else:
                 pass
 
+        #print ( allfixtures.ds_df0.sort_values(by='Rank', ascending=False) )
         return
 
     def game_decisions(self, team_h, team_a):
@@ -187,23 +179,50 @@ class allfixtures:
         ga_dxb = int(allfixtures.this_event)
         ga_delta = round(abs(ga_dxa/ga_dxb))
         game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * ga_delta
-        game_tag = "'" + str(self.team_h) + '_vs_' + str(self.team_a) + "'"
-        print ("\tLogic - ", "Pos delta:", abs(ranking_mismatch), "GD delta:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", ga_delta, "Weighting:", game_weight )
+        #game_tag = "'" + str(self.team_h) + '_vs_' + str(self.team_a) + "'"
+        game_tag = "'" + str(self.team_h) + '_' + str(self.team_a) + "'"
+
+# note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
+        ds_data0 = [[ \
+                    self.team_h, \
+                    home_team, \
+                    self.team_a, \
+                    away_team, \
+                    abs(ranking_mismatch), \
+                    abs(goal_diff_delta), \
+                    abs(gf_delta), \
+                    ga_delta, \
+                    game_weight ]]
+
+        df_temp0 = pd.DataFrame(ds_data0, \
+                    columns=[ 'Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'], index=[game_tag] )
+
+        allfixtures.ds_df0 = allfixtures.ds_df0.append(df_temp0)    # append this ROW of data into the DataFrame
+
+        # print ("\tLogic - ", "Pos delta:", abs(ranking_mismatch), "GD delta:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", ga_delta, "Weighting:", game_weight )
         # setup pandas dataframe load
-        print ("\t", "[[", self.team_h, ",", home_team, ",", self.team_a, ",", away_team, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight, "]]" )
-        print (" ")
-        print ("\t", \
-                    "data", ",", \
-                    self.team_h, ",", \
-                    home_team, ",", \
-                    self.team_a, ",", \
-                    away_team, ",", \
-                    abs(ranking_mismatch), ",", \
-                    abs(goal_diff_delta), ",", \
-                    abs(gf_delta), ",", \
-                    ga_delta, ",", \
-                    game_weight, \
-                    index=[game_tag] )
+        # print ("\t", "[[", self.team_h, ",", home_team, ",", self.team_a, ",", away_team, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight, "]]" )
+# construct pandas dataframe
+        # print ("\t", \
+        #            "df0 = pd.DataFrame(data_0,", \
+        #            "columns=['Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'],", \
+        #            "index=[", \
+        #            game_tag, \
+        #            "] )", \
+        #            )
+
+        # print ("\t", \
+        #            "data_0 = [[", \
+        #            self.team_h, ",", \
+        #            home_team, ",", \
+        #            self.team_a, ",", \
+        #            away_team, ",", \
+        #            abs(ranking_mismatch), ",", \
+        #            abs(goal_diff_delta), ",", \
+        #            abs(gf_delta), ",", \
+        #            ga_delta, ",", \
+        #            game_weight, \
+        #            "]]" )
 
         return
 
@@ -255,11 +274,11 @@ class allfixtures:
             stp_ga = stp['goalsAgainst']
             stp_gd = stp['goalDifference']
             if stp_teamid == self.se_ts:
-                print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
-                print ( "Ranked: ", pos+1, " ", end="" )
-                print ( "GF: ", stp_gf, " ", end="" )
-                print ( "GA: ", stp_ga, " ", end="" )
-                print ( "GD: ", stp_gd)
+                #print ( "\tTeam: ", stp_team, " ", end="" )    # use EPL bootstrap team NAMES
+                #print ( "Ranked: ", pos+1, " ", end="" )
+                #print ( "GF: ", stp_gf, " ", end="" )
+                #print ( "GA: ", stp_ga, " ", end="" )
+                #print ( "GD: ", stp_gd)
                 # create a tuple on the fly, with all key data science data in it
                 ds_data = 'dsd_' + str(stp_teamid)
                 # print ( "Building TUPLE name:", ds_data )
