@@ -181,14 +181,30 @@ class allfixtures:
         goal_diff_delta = ds_data_home[5] - ds_data_away[5]
         gf_delta = ds_data_home[3] - ds_data_away[3]
 
+        home_team = "'" + self.bootstrap.epl_team_names[self.team_h] + "'"
+        away_team = "'" + self.bootstrap.epl_team_names[self.team_a] + "'"
         ga_dxa = ds_data_home[4] + ds_data_away[4]
         ga_dxb = int(allfixtures.this_event)
         ga_delta = round(abs(ga_dxa/ga_dxb))
         game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * ga_delta
-        game_tag = str(self.team_h) + '_vs_' + str(self.team_a)
+        game_tag = "'" + str(self.team_h) + '_vs_' + str(self.team_a) + "'"
         print ("\tLogic - ", "Pos delta:", abs(ranking_mismatch), "GD delta:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", ga_delta, "Weighting:", game_weight )
-        print ("\t", game_tag, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight )
+        # setup pandas dataframe load
+        print ("\t", "[[", self.team_h, ",", home_team, ",", self.team_a, ",", away_team, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight, "]]" )
         print (" ")
+        print ("\t", \
+                        "data", ",", \
+                        self.team_h, ",", \
+                        home_team, ",", \
+                        self.team_a, ",", \
+                        away_team, ",", \
+                        abs(ranking_mismatch), ",", \
+                        abs(goal_diff_delta), ",", \
+                        abs(gf_delta), ",", \
+                        ga_delta, ",", \
+                        game_weight, \
+                        index=[game_tag] )
+
         return
 
     def get_standings(self):
