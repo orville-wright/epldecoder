@@ -263,7 +263,7 @@ def main():
     these_fixtures = allfixtures(i_am.playeridnum, bootstrap, next_event )
     these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
     #these_fixtures.upcomming_fixtures(0)    # 0 = NO, 1 = YES, do datascience anqalytics on fixtures
-    these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES, do datascience anqalytics on fixtures
+    these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES datascience anqalytics on fixtures
     print ( " " )
     print ( allfixtures.ds_df0.sort_values(by='Rank', ascending=False) )    # only do after fixtures datascience dataframe has been built
     print ( "### DONE ###" )
