@@ -111,8 +111,9 @@ class get_opponents_squad:
 
     def opp_squad_captain(self):
         """extract info about the captain of this oponents squad"""
+        """does work on someone eleses squad other than yours."""
 
-        logging.info('get_opponents_squad:: opp_squad_captain() - Enter' )
+        logging.info('get_opponents_squad.opp_squad_captain() - Enter' )
         t7 = []                                           # temp working dict to hold this users squad players
         oppt_tname = self.pe_live_inst.my_teamname()      # accessor to resolve additional ref'd player ENTRY data
         pe_playerid = self.pe_live_inst.owner_player_id
@@ -124,40 +125,38 @@ class get_opponents_squad:
                 find_me = t7['element']                       # get unique player ID for squad player
                 capt_name = self.bst_inst.whois_element(find_me)  # scan main payer data set - each time (!!slow-ish ~600 entities )
                 capt_gw_points = self.bst_inst.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
-                print ( pe_playerid, "(", end="" )
-                print ( oppt_tname, end="" )
-                print ( ")" \
-                        # "- Week:", self.t2['id'], \
-                        "- Captain is:", t7['element'], \
+                # print ( pe_playerid, "(", end="" )
+                print ( "Team:", oppt_tname, end="" )
+                print ( " - Captain:", t7['element'], \
                         "@ pos:", t7['position'], \
                         "-", capt_name, end="" )
-                print ( " (points:", capt_gw_points, end="" )
+                print ( " (gameweek points:", capt_gw_points, end="" )
                 print ( ")" )
 
-                logging.info('get_opponents_squad:: opp_squad_captain() - found captain - quick exit after %s loops' % player_num )
+                logging.info('get_opponents_squad.opp_squad_captain() - found captain - quick exit after %s loops' % player_num )
                 return                                            # exit as soon as captain is located
 
         print ( "Failed to locate CAPTAIN in squad", self.t1['entry'], oppt_tname )
-        logging.info('get_opponents_squad:: opp_squad_captain() - Failed to locate captain with element ID: %s' % find_me )
+        logging.info('get_opponents_squad.opp_squad_captain() - Failed to locate captain with element ID: %s' % find_me )
         return
 
         #!! needs to be fast by re-using player_entry inst
 
     def opp_sq_findplayer(self, f_playerid):
-        """Scan a players ENTRY and searchs his squad for a specific player ID"""
+        """Scan a players ENTRY and searchs his current squad for a specific player ID"""
 
         fp_id = int(f_playerid)                           # must use INT for tests
         oppt_tname = self.pe_live_inst.my_teamname()      # accessor to resolve additional ref'd player ENTRY data
-        p_name = self.bst_inst.whois_element(fp_id)      # scans main data set - each time (!!slow-ish ~600 entities )
+        p_name = self.bst_inst.whois_element(fp_id)       # scans main data set - each time (!!slow-ish ~600 entities )
         t7 = []                                           # temp working dict to hold this users squad players
         for player_num in range (0, 15):                  # note: hard-coded 14 players in a team
             t7 = self.t3[player_num]                      # scanning each squad player details (not likley to ever change)
             if t7['element'] == fp_id:
                 # TODO: load results into dict & sort by total points, then print in desc order
-                print ("Team:", self.t1['entry'], \
-                        oppt_tname, \
+                # print ("Team:", self.t1['entry'], \
+                print ( "Team:", oppt_tname, \
                         #"- Week:", self.t2['id'], \
-                        "- HAS:", t7['element'], \
+                        "- FOUND:", t7['element'], \
                         "**", p_name, \
                         "@ pos:", t7['position'] )
                 logging.info('get_opponents_squad:: opp_sq_findplayer() - found player - quick exit after %s loops' % player_num )
@@ -166,10 +165,10 @@ class get_opponents_squad:
                 #print ( ".", end="" )
                 pass
 
-        print ( "Team:", self.t1['entry'], \
-                oppt_tname, \
+#        print ( "Team:", self.t1['entry'], \
+        print ( "Team:", oppt_tname, \
                 #"- Week:", self.t2['id'], \
-                "- not in squad" )
+                "- NOT IN this squad" )
                 #, fp_id, \
                 #p_name )
         return

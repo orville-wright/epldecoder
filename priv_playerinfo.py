@@ -251,8 +251,10 @@ class priv_playerinfo:
             if capt_list['is_captain'] is True:
                 find_me = capt_list['element']
                 player_name = self.bst_inst.whois_element(find_me)
-                print ( "My captain is:", capt_list['element'], player_name )
-                logging.info('priv_playerinfo:: capt_anlytx() - quick exit after %s loops' % ca )
+                print ( "My captain is: (", end="" )
+                print ( capt_list['element'], end="")
+                print ( ") -", player_name )
+                logging.info('priv_playerinfo.capt_anlytx() - quick exit after %s loops' % ca )
                 return    # as soon as you find your captain, exit since there can only be 1
 
         return

@@ -46,7 +46,7 @@ PAGINATION = "?page_new_entries=1&page_standings=1&phase=1"
 #
 class league_details:
     """A base league class that extracts data from the payers PRIVATE dataset"""
-    cl_op_list = {}    # class global var/dict holds a list of all oponents team ID's in this league
+    cl_op_list = {}    # class global accessor : a list of all oponents team ID's in this league
     api_get_status = ""
     username = ""
     password = ""
@@ -137,9 +137,11 @@ class league_details:
 
     def my_leaguename(self):
         """ extract the Human readable real League Name """
+        """ does not print any oujtput. Only returns your info"""
+
         logging.info('league_details.my_leaguename()' )
-        print (self.league['name'])    # TODO: remove this and CHANGE to -> return(self.league['name'])
-        return
+        n = self.league['name']
+        return n
 
 
     def whose_inmy_league(self):

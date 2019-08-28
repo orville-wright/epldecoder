@@ -154,7 +154,7 @@ def main():
     if this_league is False:
         print ( "No fav league provided. Not showing Fav league LEADERBOARD" )
         print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        print ( "======================= my leagues =======================" )
+        print ( "======================= All my leagues =======================" )
         i_am.my_entry_cleagues()
         print ("==========================================================" )
     else:
@@ -165,7 +165,8 @@ def main():
         if fav_league.league_exists != 404:
             i_am.my_entry_cleagues()
             print ( " ")
-            print ( "============== League leaderbord for %s ==============" % this_league )
+            print ( "================= League leaderbord =================" )
+            print ( "==============", this_league, ":", fav_league.my_leaguename(), "===============" )
             #fav_league.whose_inmy_league()    # classic league leaderboard
             fav_league.allmy_cl_lboard(this_league)
             print ( "==========================================================" )
@@ -189,7 +190,9 @@ def main():
         pass
     else:
         print ( " " )
-        print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
+        #print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
+        print ( "==================== Captain Analytics for gameweek:", game_week, "====================" )
+        print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
         my_priv_data.capt_anlytx()                                        # find MY captain
         #for rank,opp_id in fav_league.cl_op_list.items():                    # method local var/dict
         print ( "Scanning all teams in this league...")
@@ -203,37 +206,38 @@ def main():
             pe_inst_cache[opp_id] = opp_pe_inst                           # build cache : key = playerid, data = PE instance
             opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
         print ( "==========================================================" )
+        print ( " " )
 
 # this function scans your squad, looking for a specific <Player_ID>
-# only works if -l <LEAGUE_ID> provided
+# NOTE: only triggered if -l <LEAGUE_ID> provided by user
+
     if query_player is False:
         print ( "===== not querying for any player =====" )
         print ( " " )
     else:
         find_me = bootstrap.whois_element(int(query_player))
-        print ( " ")
-        print ( "Current gameweek:", fpl_bootstrap.current_event, "- Analyzing gameweek: ", game_week )
-        print ( "Scan opponents squad for:", query_player, end="" )
-        print ( " (", end="" )
-        print ( find_me, end="" )
-        print ( ")" )
-        print ( "==========================================================" )
+        print ( "=========== Analysing all opponents squads for 1 player:", find_me, "===========" )
+        print ( "Current gameweek:", player_entry.current_event, "- Analyzing gameweek: ", game_week )
+        print ( "Scanning all opponents squads..." )
         for oppid, inst in opp_team_inst.items():    # cycle through class instances for each opponents team
             inst.opp_sq_findplayer(query_player)     # very fast. In mem scan. Pre-instantiated from elsewhere
+
         print ( "==========================================================" )
 
-# deep analytics of my squad
-# cycle through every player on my squad...(yor artive current squad)
-# cycle through eveyr player on every team in **this_leage**...(for the last game)
-# report back, which opponent shares the same squad players e.g your squad <==> opponents
-    if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
+# Deep analytics of my squad
+# NOTE: only triggered if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
+#       This makes sense because the user wants deeper league performance stats.
+# LOGIC: 1. cycle through every player in my squad...(active current squad)
+#        2. cycle through every player, on every opponents team, in **this_leage**
+#        3. for the last game (TODO: need to make this code gameweek sensitive)
+#        4. output - where your squad members are shared/across/intersects with other opponent(s) squad members
+
+    if this_league is False:
         pass
     else:
         print ( " " )
-        print ( "=========== Deep squad analytx for my active squad =============" )
-        print ( "===================== For league (", end="" )
-        print ( this_league, end="" )
-        print ( ") ======================" )
+        print ( "=========== Deep squad analytics for my active squad =============" )
+        print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
         for pos in range (0, 15):
             z = 0
             tl = ""
@@ -246,13 +250,14 @@ def main():
                         z += 1
                         x = scan_pe_cache(pe_inst_cache, oid)   # pe_inst_cache is a global dict, populated elesewhere !!
                         y = x.my_teamname()
-                        tl = tl + y + " "
+                        tl = tl + y + ", "    # concatinate a string of team names (lazy)
                     else:
                         pass
             if z != 0:
-                print ( "Found in: ", z, "teams >", tl)
+                #print ( "Found in: ", z, "teams >>", tl)
+                print ( "Found in: ", tl, z, "teams")
             else:
-                print ( "Unique player not in any opponents squad" )
+                print ( "Unique - not in any opponents squad" )
 
             print ( "+--------------------------------------------------------+" )
             z = 0

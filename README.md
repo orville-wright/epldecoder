@@ -1,7 +1,7 @@
 # epldecoder
-- (this doc is formatted as Guthub Markup lang)
+- (this doc is formatted as Github Markup lang)
 - Updated for 2019/2020 season
-   - As usual...during the 2019 off-season, the Premieership data Archiects & Developers changed many componets of the internal SON data structures of the underlying data model.
+   - As usual...during the *2019 off-season*, the Premiership data Architects & Developers changed many components in the internal JSON data structures of the underlying data model. This is normal (since their API & data-model is not public). This breaks API extract operations & code.
    - Current codebase is now aligned to 2019/2020 season.
 
 # English Premier League (EPL)
@@ -13,16 +13,16 @@ A companion to EPL Fantasy Football League game, played by 6,000,000+ users worl
 v2.0 of the project is focused on the following priorities...
 
 1. Live mem JSON ETL (Extract, Translate, Load), rather than save data to flat files & post processing datsets.
-2. Native JSON data feed via API I/O. No scraping raw data from javascript pages @ http://www.premierleague.com/en-gb.html
+2. Native JSON data feed via API I/O. No scraping raw data from JavaScript pages @ http://www.premierleague.com/en-gb.html
 3. Understanding all available REST API's used by EPL website app (i.e. a private API not publicly exposed/documented by EPL).
 4. Prototyping & validating the API data I/O interface & technology, toolset & overall private game JSON data structures & accessors.
 5. Processing API extracted JSON datasets in memory (live) for speed. (prototype v1.0 used flat file processing).
 6. Push data into MongoDB database where/when needed.
 7. Augment game decision making logic with key intelligence factors not present/provided/computed/offered in the native EPL game logic.
 8. Augmenting the game dataset with additional data/info where key data/fields/structures are not present/provided in native EPPL game & datasets.
-9. Enable users with ability to apply State-of-Art Datascience logic to game decision making. e.g. analysis, statistcs & probably A/B Hypothesis testing against EPL game data (via Datasciecne tools such as: Numpy, Pandas, Matplotlib, Scikit-Learn, Scipy & the Berkley Datascience module). Goal is to provide this capability via a Web/GUI experince, not force EPL game players to use shell & write python code.
+9. Enable users with ability to apply State-of-Art Datascience logic to game decision making. e.g. analysis, statistics & probably A/B Hypothesis testing against EPL game data (via Datasciecne tools such as: Numpy, Pandas, Matplotlib, Scikit-Learn, Scipy & the Berkley Datascience module). Goal is to provide this capability via a Web/GUI experience, not force EPL game players to use shell & write python code.
 9. Make core game data sets available, especially full historical data in non-aggregate form
-10. Augment EPL game data with additional correlated game data from other non-EPL sources. e.g. FIFA, gambliing website sites (e.g. odds), football status sites, Footbal news/rumor sites etc. Enable this additinal data to be leveraged by users in advanced inferrental Datascience based analytical game decisons.
+10. Augment EPL game data with additional correlated game data from other non-EPL sources. e.g. FIFA, gambling website sites (e.g. odds), football status sites, Football news/rumor sites etc. Enable this additional data to be leveraged by users in advanced inferential Datascience based analytical game decisions.
 
 - Not all of these capabilities are available in v2.0
 
