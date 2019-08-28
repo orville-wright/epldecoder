@@ -1,10 +1,14 @@
 # epldecoder
 - (this doc is formatted as Guthub Markup lang)
+- Updated for 2019/2020 season
+   - As usual...during the 2019 off-season, the Premieership data Archiects & Developers changed many componets of the internal SON data structures of the underlying data model.
+   - Current codebase is now aligned to 2019/2020 season.
 
-English Premier League (EPL) Fantasy Football website bootstrap API decoder/interface & Data Analytics ML platform.
+# English Premier League (EPL)
+UK Fantasy Football website bootstrap API decoder/interface & Data Analytics ML platform.
 
-Primary use case:
-A companion to EPL Fantasy Football League game, played by 5,000,000+ users worldwide on via web app/mobile app at the Barclay's EPL website: http://www.premierleague.com/en-gb.html.
+# Primary use case:
+A companion to EPL Fantasy Football League game, played by 6,000,000+ users worldwide via web app/mobile app at the Barclay's EPL website: http://www.premierleague.com/en-gb.html.
 
 v2.0 of the project is focused on the following priorities...
 
