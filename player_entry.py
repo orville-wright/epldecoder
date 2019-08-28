@@ -28,11 +28,11 @@ class player_entry:
     """but can only acesses the public data set (i.e. not current squad info)"""
 
     current_event = ""
-    instowner_player_id = ""    # global attribute. Which player owns this player-entry instance
+    owner_player_id = ""    # global attribute. Which player owns this player-entry instance
 
     def __init__(self, playeridnum):
         self.playeridnum = str(playeridnum)
-        player_entry.instowner_player_id = self.playeridnum
+        player_entry.owner_player_id = self.playeridnum
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
         EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
@@ -97,7 +97,7 @@ class player_entry:
         """Cycle thru all my Classic Leagues & print them"""
         """This will not access/print GLOBAL leagues (e.g. EPL Team leagues, Country leagues etc)"""
 
-        # logging.info('player_entry:: my_entry_cleagues(): - Init method. scan league: %s' % this_league )
+        logging.info('player_entry:: my_entry_cleagues(): - Init method. scaning %s leagues' % len(self.cleagues) )
         #print ( "Team name: %s" % self.entry['name'] )
         #print (self.entry['name'], "plays in %s leagues" % len(self.cleagues))
         p = 1

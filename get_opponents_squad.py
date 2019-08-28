@@ -38,8 +38,8 @@ class get_opponents_squad:
     """Base class to access any player/opponent team sqaud list & data """
     """note: can only access historical squad data from last game back (which is public data) """
     """must be called with a sucessfully populated instance of Player_ENTRY() """
-
     bst_inst = ""
+    api_get_status = "PRIVATE"
 
     def __init__(self, player_idnum, pe_live_inst, event_id, my_priv_data, bootstrap):
         # Base bootstrap API calls (..premierleague.com/drf/...) dont require authentication
@@ -50,10 +50,12 @@ class get_opponents_squad:
         self.pe_live_inst = pe_live_inst              # player ENTRY instance for this player - critical for de-ref'ing data
         self.username = my_priv_data.username      # username from global class var
         self.password = my_priv_data.password      # password from global class var
+        self.playeridnum = player_idnum
         get_opponents_squad.bst_inst = self.bst_inst
 #        self.password = priv_playerinfo.password      # password from global class var
 
-        logging.info('get_opponents_squad(): - Inst class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
+
+        logging.info('get_opponents_squad:: - Init class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
         s1 = requests.Session()
 
         pl_profile_cookies = { \
@@ -64,28 +66,13 @@ class get_opponents_squad:
 
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login/'
-        API_URL1 = FPL_API_URL + MYTEAM + self.playeridnum + '/'
+        API_URL1 = FPL_API_URL + MYTEAM + str(self.playeridnum) + '/'
 
         # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
         # 2nd get does the data extraction if auth succeeds
-
-        for pl, cookie_hack in pl_profile_cookies.items():
-            if pl == self.playeridnum:
-                pp_req.cookies.update({'pl_profile': cookie_hack})
-                logging.info('priv_playerinfo:: SET pl_profile cookie for userid: %s' % pl )
-                logging.info('priv_playerinfo:: SET pl_profile cookie to: %s' % cookie_hack )
-                priv_playerinfo.api_get_status = "GOODCOOKIE"
-                break    # found this players cookie
-            else:
-                logging.info('priv_playerinfo:: ERR userid is bad. No cookie found/set: %s' % pl )
-                priv_playerinfo.api_get_status = "FAILED"
-            # return    #return    # bad style. Need to return useful ERROR code
-                      # but global class var is allways set & testable
-
-        if priv_playerinfo.api_get_status == "FAILED":
-            return
-        else:
-            pass
+        logging.info('get_opponents_squad:: EXTRACT cookie from bootstrap for playerid: %s' % self.playeridnum )
+        logging.info('get_opponents_squad:: SET cookie: %s' % self.bst_inst.my_cookie )
+        s1.cookies.update({'pl_profile': self.bst_inst.my_cookie})
 
         # https://fantasy.premierleague.com/drf/entry/0123456/event/01/picks
         EXTRACT_URL = FPL_API_URL + ENTRY + PLAYER_ENTRY + "/event/" + str(event_id) + "/picks/"
@@ -99,8 +86,8 @@ class get_opponents_squad:
         self.gotdata_status = resp4.status_code                # class global var
 
         if resp3.status_code == 200:                           # initial username/password AUTH
-            logging.info('get_opponents_squad(): - Inst class. Auth succeess for target player: %s' % PLAYER_ENTRY )
-            logging.info('get_opponents_squad(): - Inst class. get URL: %s' % EXTRACT_URL )
+            logging.info('get_opponents_squad(): - Init - Auth succeess for player: %s' % PLAYER_ENTRY )
+            logging.info('get_opponents_squad(): - Init class - get URL: %s' % EXTRACT_URL )
         else:
             print ("Auth failed for player:", PLAYER_ENTRY)
             print ("###################### resp0 ########################################")
@@ -115,10 +102,10 @@ class get_opponents_squad:
         self.t0 = json.loads(resp4.text)
         self.t4 = self.t0['automatic_subs']
         self.t1 = self.t0['entry_history']
-        self.t2 = self.t0['event']
         self.t3 = self.t0['picks']    # [] has 15 sub-elements of all 15 players in your current squad
                                       # but no nice human readable data. its All refs to data in other []
         return                        # instantiation done & succeded
+
 
 # Class methods
 
@@ -128,6 +115,7 @@ class get_opponents_squad:
         logging.info('get_opponents_squad:: opp_squad_captain() - Enter' )
         t7 = []                                           # temp working dict to hold this users squad players
         oppt_tname = self.pe_live_inst.my_teamname()      # accessor to resolve additional ref'd player ENTRY data
+        pe_playerid = self.pe_live_inst.owner_player_id
         for player_num in range (0, 15):                  # note: hard-coded 14 players in a team
             t7 = self.t3[player_num]                      # scanning each squad player details (not likley to ever change)
             if t7['is_captain'] is False:
@@ -136,7 +124,7 @@ class get_opponents_squad:
                 find_me = t7['element']                       # get unique player ID for squad player
                 capt_name = self.bst_inst.whois_element(find_me)  # scan main payer data set - each time (!!slow-ish ~600 entities )
                 capt_gw_points = self.bst_inst.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
-                print ( self.t1['entry'], "(", end="" )
+                print ( pe_playerid, "(", end="" )
                 print ( oppt_tname, end="" )
                 print ( ")" \
                         # "- Week:", self.t2['id'], \

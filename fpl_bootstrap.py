@@ -47,6 +47,7 @@ class fpl_bootstrap:
     api_get_status = ""
     standings_t = ""
     epl_team_names = {}
+    my_cookie = ""
 
     def __init__(self, playeridnum, username, password):
         self.playeridnum = str(playeridnum)
@@ -77,15 +78,17 @@ class fpl_bootstrap:
         for pl, cookie_hack in pl_profile_cookies.items():
             if pl == self.playeridnum:
                 s.cookies.update({'pl_profile': cookie_hack})
-                logging.info('fpl_bootstrap:: SET pl_profile cookie for userid: %s' % pl )
-                logging.info('fpl_bootstrap:: SET pl_profile cookie to: %s' % cookie_hack )
+                logging.info('fpl_bootstrap:: FOUND - cookie for playerid: %s' % pl )
+                logging.info('fpl_bootstrap:: SET - cookie to: %s' % cookie_hack )
                 fpl_bootstrap.api_get_status = "GOODCOOKIE"
+                fpl_bootstrap.my_cookie = cookie_hack    # save cookie to as instance accessor
                 break    # found this players cookie
             else:
-                logging.info('fpl_bootstrap:: ERR userid is bad. No cookie found/set: %s' % pl )
+                logging.info('fpl_bootstrap:: NO MATCH - playerid/cookie: %s' % pl )
                 fpl_bootstrap.api_get_status = "FAILED"
 
         if fpl_bootstrap.api_get_status == "FAILED":
+            logging.info('fpl_bootstrap:: - FAIL - No cookie for player: %s EXITING... %s' % pl )
             return
         else:
             pass
@@ -183,3 +186,11 @@ class fpl_bootstrap:
             #print ( "Team:", team_name['id'], team_name['short_name'], team_name['name'] )
             self.epl_team_names[team_name['id']] = team_name['name']    # populate the class dict, which is accessible within the class fpl_bootstrap()
         return
+
+
+    def my_cookie(self):
+        """Small helper method to output this users cookie that must be used"""
+        """for any authentication operations"""
+
+        logging.info('fpl_bootstrap.my_cookie() - cookie pl_profile: %s' % fpl_bootstrap.my_cookie )
+        return fpl_bootstrap.my_cookie

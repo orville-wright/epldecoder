@@ -137,10 +137,10 @@ def main():
 
     print ( "Analyzing gameweek: ", end="" )    # if the user wants to look back in time at the non-current gameweek
     if game_week is False:
-        print ( fpl_bootstrap.current_event )    # default to current gameweek
-        game_week = fpl_bootstrap.current_event
+        print ( player_entry.current_event, "*using DEF/current" )    # default to current gameweek
+        game_week = player_entry.current_event
     else:
-        print ( game_week )                      # otherwise, use the gameweek supplied in args[]
+        print ( game_week, "**USER provided" )                      # otherwise, use the gameweek supplied in args[]
 
     my_priv_data = priv_playerinfo(this_player, username, password, bootstrap, i_am )    # info about ME
     if priv_playerinfo.api_get_status == "FAILED":
@@ -158,11 +158,11 @@ def main():
         i_am.my_entry_cleagues()
         print ("==========================================================" )
     else:
-        fav_league = league_details(this_player, this_league)    # populate an instance of my classic leagues
+        print ( " " )
+        print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
+        print ( "======================= my leagues =======================" )
+        fav_league = league_details(this_player, this_league, my_priv_data, bootstrap)    # populate an instance of my classic leagues
         if fav_league.league_exists != 404:
-            print ( " " )
-            print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-            print ( "======================= my leagues =======================" )
             i_am.my_entry_cleagues()
             print ( " ")
             print ( "============== League leaderbord for %s ==============" % this_league )
@@ -182,6 +182,7 @@ def main():
     my_priv_data.list_mysquad()
     print ( "==========================================================" )
 
+# execute  -l option
 # if NO -l <LEAGUE ID> flag, then we're not intersted in league analytics
 # if YES, then create a leaderbaord for <LEAGUE_ID> with some stats
     if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
