@@ -109,6 +109,7 @@ The ML/AI engine will operate under a set of personalize-able & tunable rules th
 
 #
 **Data Science**
+
 As of 2019/2020 season, the code now implements & leverages Data Science code & functions provided by NUMPY & PANDAS.
 This was always the long term strategy.
 These python Data Science modules work well in a LINUX env & are easy to install, but can be tricky/problematic to get installed & running in a local Windows OS env. My Windows Dev environment uses Anaconda Python because it's the only way I can get a working Matplotlib for Windows Python module that works).
