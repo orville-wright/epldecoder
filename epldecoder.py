@@ -181,6 +181,8 @@ def main():
     print ( "========================== my squad ===========================" )
     print ( "============= Warning: this is your active squad ==============" )
     my_priv_data.list_mysquad()
+    # print ( priv_playerinfo.ds_df1 )    # only do after fixtures datascience dataframe has been built
+    print ( priv_playerinfo.ds_df1.sort_values(by='PtsLG', ascending=False) )    # only do after fixtures datascience dataframe has been built
     print ( "==========================================================" )
 
 # execute  -l option

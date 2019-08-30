@@ -162,6 +162,35 @@ class fpl_bootstrap:
                 pass
         return
 
+    def what_team_name(self, elementid):
+        """Scan main bootstrap data-set for a specific EPL squad player ID"""
+        """and get the real TEAM name that this EPL player is a member of"""
+
+        logging.info('fpl_bootstrap.what_team_name() - scan target: %s' % elementid )
+        # get this players team code - explicitly address exact
+        # find_him = int(elementid-1)
+        # his_team = self.elements[find_him]['team_code']
+
+        self.element_target = str(elementid)
+        logging.info('fpl_bootstrap.what_team_name() - scan target: %s' % elementid )
+        for element in self.elements:
+            if element['id'] == elementid:
+                self.his_team = element['team_code']
+                break    # fast exit once we have the team code
+            else:
+                pass
+
+# laxy bad code...no check for failure
+
+        for element in self.teams:
+            if element['code'] == self.his_team:
+                # self.long_name = element['name']        # extract the data
+                self.short_name = element['short_name']        # extract the  data
+                return self.short_name
+            else:
+                pass
+        return
+
     def element_gw_points(self, elementid):
         """get the GAMEWEEK poinmts of an EPL player reff'd by an element ID number"""
 

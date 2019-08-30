@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 from requests.auth import HTTPDigestAuth
 import json
 import logging
+import pandas as pd
 
 ########################################
 
@@ -34,6 +35,7 @@ class priv_playerinfo:
     auth_status = ""
     api_get_status = ""
     bst_inst = ""
+    ds_df1 = ""        # Data science DATA FRANME 1 (MY squad)
 
     def __init__(self, playeridnum, username, password, bootstrap, playerentry):
         self.playeridnum = str(playeridnum)
@@ -46,6 +48,7 @@ class priv_playerinfo:
         priv_playerinfo.bst_inst = self.bst_inst
 
         logging.info('priv_playerinfo:: init class instance for player: %s' % self.playeridnum )
+        priv_playerinfo.ds_df1 = pd.DataFrame(columns=[ 'Player', 'Name', 'Uiqid', 'Team', 'Role', 'Value', 'PtsLG'] )
         pp_req = requests.Session()
 
         # WARNING: This cookie is critical (must be set)
@@ -136,6 +139,8 @@ class priv_playerinfo:
             priv_playerinfo.api_get_status = "SUCCESS"
         return
 
+#######################################
+# CLASS methods
     def my_stats(self):
         """get some basic points & stats info about my team"""
 
@@ -145,47 +150,17 @@ class priv_playerinfo:
         print ("Points in last game: %s" % self.entrydb.my_event_points() )
         return
 
-    def mysquad_insertdb(self):
-        """Extract squad data about my team"""
-        ''"squad data is not accessible from base ENTRY structure (which doesn't require auth to access)"""
-        """squad data is constrained/contextualized to an event week. Can only be accessed in that form"""
-
-        logging.info( "priv_playerinfo:: mysquad_insertdb()" )
-        mclient = MongoClient("mongodb://admin:sanfran1@localhost/admin")
-        db = mclient.test1
-        print ("Extracting my squad player/position details: ", end="")
-
-        squad = []
-        for sp in range (0, 15):              # note: squad_player hard-coded to 14 players per team
-            print (sp, end="")
-            print (".", end="" )
-            squad = self.picks[sp]            # access data heirachery of my squad list of players
-            dbcol = db.eplmysquad_ML          # should drop collection before inserting ensuring only 1 set of data is present
-                                              # eplmysquad_ML - holds only specific data for Analytics & reporting across multiple teams
-
-            if squad['is_captain'] is True:
-               player_type = "Captain"
-            elif squad['is_vice_captain'] is True:
-               player_type = "Vice captain"
-#            elif squad['is_sub'] is True:
-#                player_type = "Sub"
-            else:
-               player_type = "Regular player"
-               result = dbcol.insert({ "Team": self.entry['name'], "week": self.entry['current_event'], "Player": squad['element'], "Position": squad['position'], "Player_type": player_type, "Price": squad['selling_price'] })
-            #print (".", end="" )
-        return
-
     def list_mysquad(self):
-        """Print details about the players in my current squad"""
-        # self.bst_inst = bootstrap              # insert core bootstrap database instance ref into parent class attributre
-        # priv_bootstrap = self.bst_inst
+        """Print details about the players in MY current squad"""
+# migrated to Data science output using PANDAS & NUMPY
+        self.sp_idx = ""
 
         logging.info('priv_playerinfo:: list_mysquad() - Analyzing captain for team %s' % self.playeridnum )
         squad = []                            # temp working []
         for sp in range (0, 15):              # note: squad_player hard-coded to 14 players per team
-            print ("Squad member:", sp+1, end="")
-            print ("...", end="" )
-
+            self.sp_idx = sp                  # accessor
+            # print ("Squad member:", sp+1, end="")
+            # print ("...", end="" )
             squad = self.picks[sp]            # access data heirachery of my squad list of players
             if squad['is_captain'] is True:
                player_type = "Captain"
@@ -197,17 +172,39 @@ class priv_playerinfo:
                player_type = "Regular player"
 
             find_me = squad['element']
+
+            # this is slow, becasue each data point requires scanning DB from start
+            # need to optimze multiuple data extractions concurrently in common data zones
             player_name = self.bst_inst.whois_element(find_me)            # global handle set once @ start
+            players_team = self.bst_inst.what_team_name(find_me)
             self.gw_points = self.bst_inst.element_gw_points(find_me)
-            print ( player_name, "(", end="" )
-            print ( squad['element'], end="" )
-            print ( ")" \
+
+            # print ( player_name, "(", end="" )
+            # print ( squad['element'], end="" )
+            # print ( ")" \
                     # " - @ pos:", squad['position'], \
-                    "-", player_type, \
-                    "$:", squad['selling_price']/10, \
-                    "- points (", end="" )
-            print ( self.gw_points, end="" )
-            print ( ")" )
+            #        "-", player_type, \
+            #        "$:", squad['selling_price']/10, \
+            #        "- points (", end="" )
+            # print ( self.gw_points, end="" )
+            # print ( ")" )
+
+            # setup PANDAS DataFrame
+            # TODO: Add players team name
+            ds_data1 = [[ \
+                        self.sp_idx+1, \
+                        player_name, \
+                        find_me, \
+                        players_team, \
+                        player_type, \
+                        squad['selling_price']/10, \
+                        self.gw_points ]]
+
+            # build PANDAS DataFrame
+            df_temp1 = pd.DataFrame(ds_data1, \
+                        columns=[ 'Player', 'Name', 'Uiqid', 'Team', 'Role', 'Value', 'PtsLG'], index=[find_me] )
+
+            priv_playerinfo.ds_df1 = priv_playerinfo.ds_df1.append(df_temp1)    # append this ROW of data into the DataFrame
         return
 
     def get_oneplayer(self, player_num):    # 0...15 are only valid squad member positions
@@ -257,4 +254,37 @@ class priv_playerinfo:
                 logging.info('priv_playerinfo.capt_anlytx() - quick exit after %s loops' % ca )
                 return    # as soon as you find your captain, exit since there can only be 1
 
+        return
+
+
+# Insert data into MONGODB
+# Currently not leveraged, but will be for multi-user platform mode
+    def mysquad_insertdb(self):
+        """Extract squad data about my team"""
+        ''"squad data is not accessible from base ENTRY structure (which doesn't require auth to access)"""
+        """squad data is constrained/contextualized to an event week. Can only be accessed in that form"""
+
+        logging.info( "priv_playerinfo:: mysquad_insertdb()" )
+        mclient = MongoClient("mongodb://admin:sanfran1@localhost/admin")
+        db = mclient.test1
+        print ("Extracting my squad player/position details: ", end="")
+
+        squad = []
+        for sp in range (0, 15):              # note: squad_player hard-coded to 14 players per team
+            print (sp, end="")
+            print (".", end="" )
+            squad = self.picks[sp]            # access data heirachery of my squad list of players
+            dbcol = db.eplmysquad_ML          # should drop collection before inserting ensuring only 1 set of data is present
+                                              # eplmysquad_ML - holds only specific data for Analytics & reporting across multiple teams
+
+            if squad['is_captain'] is True:
+               player_type = "Captain"
+            elif squad['is_vice_captain'] is True:
+               player_type = "Vice captain"
+#            elif squad['is_sub'] is True:
+#                player_type = "Sub"
+            else:
+               player_type = "Regular player"
+               result = dbcol.insert({ "Team": self.entry['name'], "week": self.entry['current_event'], "Player": squad['element'], "Position": squad['position'], "Player_type": player_type, "Price": squad['selling_price'] })
+            #print (".", end="" )
         return

@@ -40,7 +40,7 @@ class allfixtures:
     api_get_status = ""
     standings_t = ""
     bootstrap = ""
-    ds_df0 = ""
+    ds_df0 = ""        # Data science DATA FRAME 0  (fixtures)
 
 
     def __init__(self, playerid, bootstrapdb, eventnum):
