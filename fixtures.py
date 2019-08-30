@@ -173,14 +173,14 @@ class allfixtures:
         goal_diff_delta = ds_data_home[5] - ds_data_away[5]
         gf_delta = ds_data_home[3] - ds_data_away[3]
 
-        home_team = "'" + self.bootstrap.epl_team_names[self.team_h] + "'"
-        away_team = "'" + self.bootstrap.epl_team_names[self.team_a] + "'"
+        home_team = self.bootstrap.epl_team_names[self.team_h]
+        away_team = self.bootstrap.epl_team_names[self.team_a]
         ga_dxa = ds_data_home[4] + ds_data_away[4]
         ga_dxb = int(allfixtures.this_event)
         ga_delta = round(abs(ga_dxa/ga_dxb))
         game_weight = abs(ranking_mismatch) * abs(goal_diff_delta) * abs(gf_delta) * ga_delta
         #game_tag = "'" + str(self.team_h) + '_vs_' + str(self.team_a) + "'"
-        game_tag = "'" + str(self.team_h) + '_' + str(self.team_a) + "'"
+        game_tag = str(self.team_h) + '_' + str(self.team_a)
 
 # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
         ds_data0 = [[ \
