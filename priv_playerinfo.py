@@ -173,24 +173,12 @@ class priv_playerinfo:
 
             find_me = squad['element']
 
-            # this is slow, becasue each data point requires scanning DB from start
-            # need to optimze multiuple data extractions concurrently in common data zones
+            # slow, becasue requires scanning entire DB from start fro each player
+            # optimze multiuple data extractions concurrently for common data zones
             player_name = self.bst_inst.whois_element(find_me)            # global handle set once @ start
             players_team = self.bst_inst.what_team_name(find_me)
             self.gw_points = self.bst_inst.element_gw_points(find_me)
-
-            # print ( player_name, "(", end="" )
-            # print ( squad['element'], end="" )
-            # print ( ")" \
-                    # " - @ pos:", squad['position'], \
-            #        "-", player_type, \
-            #        "$:", squad['selling_price']/10, \
-            #        "- points (", end="" )
-            # print ( self.gw_points, end="" )
-            # print ( ")" )
-
             # setup PANDAS DataFrame
-            # TODO: Add players team name
             ds_data1 = [[ \
                         self.sp_idx+1, \
                         player_name, \
@@ -199,11 +187,10 @@ class priv_playerinfo:
                         player_type, \
                         squad['selling_price']/10, \
                         self.gw_points ]]
-
-            # build PANDAS DataFrame
+            # populate new working DataFrame
             df_temp1 = pd.DataFrame(ds_data1, \
                         columns=[ 'Player', 'Name', 'Uiqid', 'Team', 'Role', 'Value', 'PtsLG'], index=[find_me] )
-
+            # inset new row into DataFrame
             priv_playerinfo.ds_df1 = priv_playerinfo.ds_df1.append(df_temp1)    # append this ROW of data into the DataFrame
         return
 
