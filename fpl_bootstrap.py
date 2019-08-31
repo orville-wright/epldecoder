@@ -81,7 +81,7 @@ class fpl_bootstrap:
                 logging.info('fpl_bootstrap:: FOUND - cookie for playerid: %s' % pl )
                 logging.info('fpl_bootstrap:: SET - cookie to: %s' % cookie_hack )
                 fpl_bootstrap.api_get_status = "GOODCOOKIE"
-                fpl_bootstrap.my_cookie = cookie_hack    # save cookie to as instance accessor
+                fpl_bootstrap.my_cookie = cookie_hack    # save cookie as instance accessor
                 break    # found this players cookie
             else:
                 logging.info('fpl_bootstrap:: NO MATCH - playerid/cookie: %s' % pl )
