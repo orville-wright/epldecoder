@@ -125,12 +125,12 @@ class allfixtures:
 
     def upcomming_fixtures(self, ds_yes_no):
         """Fixtures are messy in the main JSON data model"""
-        """There is no simple & readily accessible database that qwuicly available."""
+        """There is no simple data set / table quickly available."""
         """You have to build/interrogate your list of fixtures every time"""
 
 #       This JSON structure was destroyed in the 2019/2020 season changes.
         self.datasci = ds_yes_no
-        logging.info('allfixtures:: upcomming_fixtures() - init : %s' % ds_yes_no )
+        logging.info('allfixtures.upcomming_fixtures() - init : %s' % ds_yes_no )
 
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
         print ( "Show fixtures for gameweek...", self.eventnum )
@@ -168,13 +168,19 @@ class allfixtures:
         logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
         ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
         ds_data_away = self.standings_extractor(away)    # ditto
+
+        # team standings dataset
         # teamid, team_full_name, ranking_pos, gf, ga, gd)
         ranking_mismatch = ds_data_home[2] - ds_data_away[2]
-        goal_diff_delta = ds_data_home[5] - ds_data_away[5]
+        goal_diff_delta = abs(ds_data_home[5] - ds_data_away[5])
         gf_delta = ds_data_home[3] - ds_data_away[3]
+        if goal_diff_delta == 0:
+            goal_diff_delta = 1
 
+        # Team names dataset
         home_team = self.bootstrap.epl_team_names[self.team_h]
         away_team = self.bootstrap.epl_team_names[self.team_a]
+
         ga_dxa = ds_data_home[4] + ds_data_away[4]
         ga_dxb = int(allfixtures.this_event)
         ga_delta = round(abs(ga_dxa/ga_dxb))
