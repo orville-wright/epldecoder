@@ -63,7 +63,7 @@ class get_opponents_squad:
 
 # new v3.0 cookie hack
         logging.info('get_opponents_squad:: EXTRACT saved cookie from bootstrap for playerid: %s' % self.playeridnum )
-        logging.info('get_opponents_squad:: SET cookie: %s' % self.bootstrap.my_cookie )
+        logging.info('get_opponents_squad:: SET cookie: %s' % self.bst_inst.my_cookie )
         s1.cookies.update({'pl_profile': self.bst_inst.my_cookie})
 
 # Do REST API I/O now...
