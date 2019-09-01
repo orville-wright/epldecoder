@@ -54,34 +54,23 @@ class get_opponents_squad:
         get_opponents_squad.bst_inst = self.bst_inst
 #        self.password = priv_playerinfo.password      # password from global class var
 
-
-        logging.info('get_opponents_squad:: - Init class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
+        logging.info('get_opponents_squad:: Init class. Auth API get priv player data for: %s' % PLAYER_ENTRY )
         s1 = requests.Session()
-
-        pl_profile_cookies = { \
-                '1212166': 'eyJzIjogIld6VXNNalUyTkRBM01USmQ6MWZpdE1COjZsNkJ4bngwaGNUQjFwa3hMMnhvN2h0OGJZTSIsICJ1IjogeyJsbiI6ICJBbHBoYSIsICJmYyI6IDM5LCAiaWQiOiAyNTY0MDcxMiwgImZuIjogIkRyb2lkIn19', \
-                '1995215': 'eyJzIjogIld6SXNNalUyTkRBM01USmQ6MWh5aE9BOmdLcXg0S3RkSGR5UVRXRjUwVjhxZHR4RVNTayIsICJ1IjogeyJpZCI6IDI1NjQwNzEyLCAiZm4iOiAiRHJvaWQiLCAibG4iOiAiQWxwaGEiLCAiZmMiOiA1N319', \
-                '1994221': 'eyJzIjogIld6SXNOVGc0T0RnM05WMDoxaHlpdU46MlhhRDZlbkx3YU03WFdtb0tBWEhsYXlESlBnIiwgInUiOiB7ImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIiwgImxuIjogIkJyYWNlIiwgImZjIjogOH19', \
-                '1136396': 'eyJzIjogIld6VXNOVGc0T0RnM05WMDoxZnYzYWo6WGkxd1lMMnpLeW1pbThFTTVFeGEzVFdUaWtBIiwgInUiOiB7ImxuIjogIkJyYWNlIiwgImZjIjogOCwgImlkIjogNTg4ODg3NSwgImZuIjogIkRhdmlkIn19' }
-
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login/'
         API_URL1 = FPL_API_URL + MYTEAM + str(self.playeridnum) + '/'
-
-        # 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
-        # 2nd get does the data extraction if auth succeeds
-        logging.info('get_opponents_squad:: EXTRACT cookie from bootstrap for playerid: %s' % self.playeridnum )
-        logging.info('get_opponents_squad:: SET cookie: %s' % self.bst_inst.my_cookie )
-        s1.cookies.update({'pl_profile': self.bst_inst.my_cookie})
-
-        # https://fantasy.premierleague.com/drf/entry/0123456/event/01/picks
         EXTRACT_URL = FPL_API_URL + ENTRY + PLAYER_ENTRY + "/event/" + str(event_id) + "/picks/"
 
-        # 1st get does the authentication, but must use the critical cookie (i.e. "pl_profile")
-        # 2nd get does the real data extraction
+# new v3.0 cookie hack
+        logging.info('get_opponents_squad:: EXTRACT saved cookie from bootstrap for playerid: %s' % self.playeridnum )
+        logging.info('get_opponents_squad:: SET cookie: %s' % self.bootstrap.my_cookie )
+        s1.cookies.update({'pl_profile': self.bst_inst.my_cookie})
+
+# Do REST API I/O now...
+# 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
+# 2nd get does the data extraction if auth succeeds - failure = all JSON dicts/fields are empty
         resp3 = s1.get('https://fantasy.premierleague.com/a/login', headers=user_agent, auth=HTTPBasicAuth(self.username, self.password))
         resp4 = s1.get(EXTRACT_URL, headers=user_agent, auth=HTTPDigestAuth(self.username, self.password))
-
         self.auth_status = resp3.status_code                   # class gloabl var
         self.gotdata_status = resp4.status_code                # class global var
 

@@ -84,16 +84,14 @@ class fpl_bootstrap:
                 fpl_bootstrap.my_cookie = cookie_hack    # save cookie as instance accessor
                 break    # found this players cookie
             else:
-                logging.info('fpl_bootstrap:: NO MATCH - playerid/cookie: %s' % pl )
+                logging.info('fpl_bootstrap:: NO MATCH - cookie/playerid: %s' % pl )
                 fpl_bootstrap.api_get_status = "FAILED"
 
         if fpl_bootstrap.api_get_status == "FAILED":
-            logging.info('fpl_bootstrap:: - FAIL - No cookie for player: %s EXITING... %s' % pl )
+            logging.info('fpl_bootstrap:: ABORT - No cookie for player: %s EXITING... %s' % pl )
             return
-        else:
-            pass
-
-# REST API I/O now... - 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
+# Do REST API I/O now...
+# 1st get authenticates, but must use critical cookie (i.e. "pl_profile")
 # 2nd get does the data extraction if auth succeeds - failure = all JSON dicts/fields are empty
         rx0 = s.get( API_URL0, headers=user_agent, auth=HTTPBasicAuth(self.username, self.password) )
         rx1 = s.get( API_URL1, headers=user_agent, auth=HTTPDigestAuth(self.username, self.password) )
