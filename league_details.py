@@ -51,6 +51,7 @@ class league_details:
     username = ""
     password = ""
     my_priv_data = ""
+    bootstrap = ""
 
     def __init__(self, playeridnum, leagueidnum, my_priv_data, bootstrap):
         self.playeridnum = str(playeridnum)
@@ -59,6 +60,7 @@ class league_details:
         league_details.username = my_priv_data.username
         league_details.password = my_priv_data.password
         league_details.my_priv_data = my_priv_data
+        league_details.bootstrap = bootstrap
 
         logging.info('league_details:: - init: Playerid: %s league num: %s' % (self.playeridnum, self.leagueidnum))
         self.t = requests.Session()
@@ -202,7 +204,7 @@ class league_details:
 
     def cleagues_leaderboard(self):    # this was the orignal/OLD recursive league standings report
         """NOT IN USE """
-        """this method does good pre-checks"""
+        """Broken & Old : this method does good pre-checks"""
 
         logging.info('league_details.cleagues_leaderboard()' )
         #print ("Analyzing league: ", self.league['name'] )
@@ -244,6 +246,7 @@ class league_details:
 
             league_details.cl_op_list[v['rank']] = v['entry']    #populate class global dict (this league: rank, player_team_id)
 
-            #self.cl_op_list[v['rank']] = v['entry']    #populate class global dict (this league: rank, player_team_id)
-            # TODO: this is where you can pre-populate the each league detals instance for faster full scanning analytics later
+            # self.cl_op_list[v['rank']] = v['entry']
+            # populate class global dict (this league: rank, player_team_id)
+            # TODO: this is where you can pre-populate each league detals instance for faster full scanning analytics later
         return
