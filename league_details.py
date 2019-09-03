@@ -5,6 +5,7 @@ import json
 import sys
 import logging
 import http.client
+import pandas as pd
 
 from requests.auth import HTTPBasicAuth
 from requests.auth import HTTPDigestAuth
@@ -52,6 +53,7 @@ class league_details:
     password = ""
     my_priv_data = ""
     bootstrap = ""
+    ds_df_ld0 = ""        # Data science DATA FRAME 0  (fixtures)
 
     def __init__(self, playeridnum, leagueidnum, my_priv_data, bootstrap):
         self.playeridnum = str(playeridnum)
@@ -61,16 +63,17 @@ class league_details:
         league_details.password = my_priv_data.password
         league_details.my_priv_data = my_priv_data
         league_details.bootstrap = bootstrap
+        league_details.ds_df_ld0 = pd.DataFrame(columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints' ] )
 
-        logging.info('league_details:: - init: Playerid: %s league num: %s' % (self.playeridnum, self.leagueidnum))
+        logging.info('league_details:: init: Playerid: %s league num: %s' % (self.playeridnum, self.leagueidnum))
         self.t = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
         EXTRACT_URL = FPL_API_URL + LCS_SUBURL + str(leagueidnum) + '/standings/' + PAGINATION
 
  #new v3.0 cookie hack
-        logging.info('get_opponents_squad:: EXTRACT saved cookie from bootstrap for playerid: %s' % self.playeridnum )
-        logging.info('get_opponents_squad:: SET cookie: %s' % self.bootstrap.my_cookie )
+        logging.info('league_details:: EXTRACT saved cookie from bootstrap for playerid: %s' % self.playeridnum )
+        logging.info('league_details:: SET cookie: %s' % self.bootstrap.my_cookie )
         self.t.cookies.update({'pl_profile': self.bootstrap.my_cookie})
 
 # Do REST API I/O now...
@@ -85,8 +88,6 @@ class league_details:
 
         tx0_auth_cookie = requests.utils.dict_from_cookiejar(self.t.cookies)
         logging.info('league_details:: AUTH login resp cookie: %s' % tx0_auth_cookie['pl_profile'] )
-
-####
 
         if tx.status_code == 404:    # 404 means this league number does not exists
             logging.info('league_details:: init ERROR - API get failed - league %s does not exist' % leagueidnum )
@@ -104,7 +105,6 @@ class league_details:
             self.results = self.standings['results']
             # self.ne_pending = self.new_entries['results']  # depricated 2019/2020 season
             #self.new_entries = t2['new_entries']
-
         return
 
     def my_leagueidnum(self):
@@ -230,20 +230,24 @@ class league_details:
 
     def allmy_cl_lboard(self, this_league):    # list of CLASSIC leagues player is entered in
         # this method sets-up the global class var/dict fofr iterating
-        """ cycle thru a list of all my leagues & prints them """
-        """ Also populates an class global vaariable/dict (self.cl_op_list) with same info """
+        """Cycle thru a league & extract recent perfromance info"""
+        """Also populates an class global vaariable/dict (self.cl_op_list) with same info"""
 
         logging.info('league_details.allmy_cl_lboard(): Analyzing league ID: %s' % this_league )    # this_league <- args[]
-        #print ( "Details for fav league:", self.league['id'], "(", self.league['name'], ")" )    # this_league <- args[]
-
         for v in self.results:
             a = str(this_league)
-            print ( "Rank: %s Team: %s %s - %s - Gameweek points: %s" % ( \
-                    v['rank'], \
-                    v['entry'], v['entry_name'], \
-                    v['player_name'], \
-                    v['event_total'] ))
+            idx = v['rank']
+            ds_data1 = [[ \
+                        v['rank'],
+                        v['entry_name'], \
+                        v['entry'], \
+                        v['player_name'], \
+                        v['event_total'] ]]
 
+            df_temp1 = pd.DataFrame(ds_data1, \
+                        columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints' ], index=[idx] )
+
+            league_details.ds_df_ld0 = league_details.ds_df_ld0.append(df_temp1)    # append this ROW of data into the DataFrame
             league_details.cl_op_list[v['rank']] = v['entry']    #populate class global dict (this league: rank, player_team_id)
 
             # self.cl_op_list[v['rank']] = v['entry']

@@ -151,26 +151,26 @@ def main():
         my_priv_data.my_stats()
         print ( " " )
 
+# show some info & stats about the leaguies that this player is registered in
+    print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
+    print ( "======================= All my leagues =======================" )
+    i_am.my_entry_cleagues()
+    print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
+
     if this_league is False:
-        print ( "No fav league provided. Not showing Fav league LEADERBOARD" )
-        print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        print ( "======================= All my leagues =======================" )
-        i_am.my_entry_cleagues()
-        print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
-        print ("==========================================================" )
+        print ( "===============================================================" )
     else:
-        print ( " " )
-        print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        print ( "======================= my leagues =======================" )
+        #print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
+        #print ( "======================= my leagues =======================" )
         fav_league = league_details(this_player, this_league, my_priv_data, bootstrap)    # populate an instance of my classic leagues
         if fav_league.league_exists != 404:
             i_am.my_entry_cleagues()
-            print ( " ")
-            print ( "================= League leaderbord =================" )
-            print ( "==============", this_league, ":", fav_league.my_leaguename(), "===============" )
+            print ( "====================== League leaderbord =====================" )
+            print ( "=======================", fav_league.my_leaguename(), "========================" )
             #fav_league.whose_inmy_league()    # classic league leaderboard
             fav_league.allmy_cl_lboard(this_league)
-            print ( "==========================================================" )
+            print ( league_details.ds_df_ld0.sort_values(by='GWpoints', ascending=False) )    # only do after fixtures datascience dataframe has been built
+            print ( "==============================================================" )
         else:
             print ( "ERROR - bad fav league number entered" )
 
