@@ -3,6 +3,7 @@ import requests
 from requests import Request, Session
 import json
 import logging
+import pandas as pd
 
 FPL_API_URL = "https://fantasy.premierleague.com/api/"
 BST = "bootstrap/"
@@ -29,11 +30,13 @@ class player_entry:
 
     current_event = ""
     owner_player_id = ""    # global attribute. Which player owns this player-entry instance
+    ds_df_pe0 = ""          # Data science DATA FRAME 0  (fixtures)
 
     def __init__(self, playeridnum):
         self.playeridnum = str(playeridnum)
         player_entry.owner_player_id = self.playeridnum
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
+        player_entry.ds_df_pe0 = pd.DataFrame(columns=[ 'Index', 'League name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ] )
         EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
         s = requests.Session()
@@ -94,15 +97,37 @@ class player_entry:
         return self.entry['summary_event_points']
 
     def my_entry_cleagues(self):    # list of all CLASSIC leagues player is entered in
-        """Cycle thru all my Classic Leagues & print them"""
-        """This will not access/print GLOBAL leagues (e.g. EPL Team leagues, Country leagues etc)"""
+        """Cycle thru all my Classic Leagues populate data science dataframe"""
 
-        logging.info('player_entry:: my_entry_cleagues(): - Init method. scaning %s leagues' % len(self.cleagues) )
+        logging.info('player_entry.my_entry_cleagues(): - Init method. scan %s leagues...' % len(self.cleagues) )
         #print ( "Team name: %s" % self.entry['name'] )
         #print (self.entry['name'], "plays in %s leagues" % len(self.cleagues))
         p = 1
         for v in self.cleagues:
-            print ("", p, "League ID: %s %s - I am ranked: %s" % (v['id'], v['name'], v['entry_rank']))
+            logging.info('player_entry.my_entry_cleagues(): scan league %s...' % p )
+            # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
+            lrank = v['entry_last_rank']
+            crank = v['entry_rank']
+            moved =  lrank - crank
+            if moved == 0:
+                levelup = "="
+            elif lrank > crank:
+                levelup = "+"
+            else:
+                levelup = "-"
+
+            ds_data0 = [[ \
+                        p, \
+                        v['name'], \
+                        v['id'], \
+                        v['entry_rank'], \
+                        v['entry_last_rank'],
+                        moved, levelup ]]
+
+            df_temp0 = pd.DataFrame(ds_data0, \
+                        columns=[ 'Index', 'League name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ], index=[p] )
+
+            player_entry.ds_df_pe0 = player_entry.ds_df_pe0.append(df_temp0)    # append this ROW of data into the DataFrame
             p += 1
         return
 

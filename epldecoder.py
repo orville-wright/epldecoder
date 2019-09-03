@@ -156,6 +156,7 @@ def main():
         print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
         print ( "======================= All my leagues =======================" )
         i_am.my_entry_cleagues()
+        print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
         print ("==========================================================" )
     else:
         print ( " " )
