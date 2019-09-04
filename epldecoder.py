@@ -277,5 +277,9 @@ def main():
     print ( allfixtures.ds_df0.sort_values(by='Rank', ascending=False) )    # only do after fixtures datascience dataframe has been built
     print ( "### DONE ###" )
 
+    # Pandas & Numpy select/query hacking...
+    #print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
+    #print ( player_entry.ds_df_pe0.query( ' Lid == 479703 ' ) )    # only do after fixtures datascience dataframe has been built
+
 if __name__ == '__main__':
     main()

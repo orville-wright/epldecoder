@@ -63,7 +63,7 @@ class league_details:
         league_details.password = my_priv_data.password
         league_details.my_priv_data = my_priv_data
         league_details.bootstrap = bootstrap
-        league_details.ds_df_ld0 = pd.DataFrame(columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints' ] )
+        league_details.ds_df_ld0 = pd.DataFrame(columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints', 'lrank', 'Total', 'moved', 'levelup' ] )
 
         logging.info('league_details:: init: Playerid: %s league num: %s' % (self.playeridnum, self.leagueidnum))
         self.t = requests.Session()
@@ -237,15 +237,29 @@ class league_details:
         for v in self.results:
             a = str(this_league)
             idx = v['rank']
+            lrank = v['last_rank']
+            crank = v['rank']
+            moved =  lrank - crank
+            if moved == 0:
+                levelup = "="
+            elif lrank > crank:
+                levelup = "+"
+            else:
+                levelup = "-"
+
             ds_data1 = [[ \
                         v['rank'],
                         v['entry_name'], \
                         v['entry'], \
                         v['player_name'], \
-                        v['event_total'] ]]
+                        v['event_total'],
+                        lrank, \
+                        v['total'], \
+                        moved, \
+                        levelup ]]
 
             df_temp1 = pd.DataFrame(ds_data1, \
-                        columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints' ], index=[idx] )
+                        columns=[ 'Rank', 'Team_name', 'Teamid', 'Manager', 'GWpoints', 'lrank', 'Total', 'moved', 'levelup' ], index=[idx] )
 
             league_details.ds_df_ld0 = league_details.ds_df_ld0.append(df_temp1)    # append this ROW of data into the DataFrame
             league_details.cl_op_list[v['rank']] = v['entry']    #populate class global dict (this league: rank, player_team_id)
