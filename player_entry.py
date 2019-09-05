@@ -36,7 +36,7 @@ class player_entry:
         self.playeridnum = str(playeridnum)
         player_entry.owner_player_id = self.playeridnum
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
-        player_entry.ds_df_pe0 = pd.DataFrame(columns=[ 'Index', 'League name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ] )
+        player_entry.ds_df_pe0 = pd.DataFrame(columns=[ 'Index', 'League_name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ] )
         EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
         s = requests.Session()
@@ -125,7 +125,7 @@ class player_entry:
                         moved, levelup ]]
 
             df_temp0 = pd.DataFrame(ds_data0, \
-                        columns=[ 'Index', 'League name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ], index=[p] )
+                        columns=[ 'Index', 'League_name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ], index=[p] )
 
             player_entry.ds_df_pe0 = player_entry.ds_df_pe0.append(df_temp0)    # append this ROW of data into the DataFrame
             p += 1
