@@ -281,9 +281,11 @@ def main():
     #print ( player_entry.ds_df_pe0.query( ' Lid == 479703 ' ) )    # only do after fixtures datascience dataframe has been built
     #print ( allfixtures.ds_df0[(allfixtures.ds_df0['Rank'] > 1000) ] )
 
-    #print ( league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ] )
     pa =  league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]
+    pd =  pa.Total.iloc[0]
     pb =  pa[ (pa['Rank'] == 1) ]
+    pc =  pb.Total.iloc[0]
+
     #pb.index.name = 'i'
     # pb = pb.drop('Rank', axis=1)
     # pa.to_numpy()
@@ -291,9 +293,13 @@ def main():
     print ( "TO_NUMPY:", pa.to_numpy() )
     print ( " " )
     print ( "PANDAS DF select:", pa['Total'] )
-    px = pb['Total']
-    print ( "PX:", px )
-    print ( pb )
+    #px = pb['Total']
+    #print ( "PX[1]:", px.iloc[0] )
+    print ( "Pa:", pa )
+    print ( "Pb", pb )
+    print ( "Pc:", pc )
+    print ( "Pd:", pd )
+
     # pa.drop('Rank', axis=1)    # this works
     #print ( "PANDAS:", pa['Total'].drop('idx', axis=1) )
 
