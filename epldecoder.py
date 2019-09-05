@@ -169,7 +169,10 @@ def main():
             print ( "=======================", fav_league.my_leaguename(), "========================" )
             #fav_league.whose_inmy_league()    # classic league leaderboard
             fav_league.allmy_cl_lboard(this_league)
-            print ( league_details.ds_df_ld0.sort_values(by='GWpoints', ascending=False) )    # only do after fixtures datascience dataframe has been built
+            #print ( league_details.ds_df_ld0.sort_values(by='GWpoints', ascending=False) )    # only do after fixtures datascience dataframe has been built
+            lx0 =  league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the top ranked player
+            lx1 =  lx0.Total.iloc[0]    # extract the total points of the top ranked player
+            print ( league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] ) )
             print ( "==============================================================" )
         else:
             print ( "ERROR - bad fav league number entered" )
@@ -276,32 +279,6 @@ def main():
     print ( " " )
     print ( allfixtures.ds_df0.sort_values(by='Rank', ascending=False) )    # only do after fixtures datascience dataframe has been built
     print ( "### DONE ###" )
-
-    # Pandas & Numpy select/query hacking...
-    #print ( player_entry.ds_df_pe0.query( ' Lid == 479703 ' ) )    # only do after fixtures datascience dataframe has been built
-    #print ( allfixtures.ds_df0[(allfixtures.ds_df0['Rank'] > 1000) ] )
-
-    pa =  league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]
-    pd =  pa.Total.iloc[0]
-    pb =  pa[ (pa['Rank'] == 1) ]
-    pc =  pb.Total.iloc[0]
-
-    #pb.index.name = 'i'
-    # pb = pb.drop('Rank', axis=1)
-    # pa.to_numpy()
-
-    print ( "TO_NUMPY:", pa.to_numpy() )
-    print ( " " )
-    print ( "PANDAS DF select:", pa['Total'] )
-    #px = pb['Total']
-    #print ( "PX[1]:", px.iloc[0] )
-    print ( "Pa:", pa )
-    print ( "Pb", pb )
-    print ( "Pc:", pc )
-    print ( "Pd:", pd )
-
-    # pa.drop('Rank', axis=1)    # this works
-    #print ( "PANDAS:", pa['Total'].drop('idx', axis=1) )
 
 if __name__ == '__main__':
     main()
