@@ -234,9 +234,10 @@ class league_details:
         """Also populates an class global vaariable/dict (self.cl_op_list) with same info"""
 
         logging.info('league_details.allmy_cl_lboard(): Analyzing league ID: %s' % this_league )    # this_league <- args[]
+        idx = 1
         for v in self.results:
             a = str(this_league)
-            idx = v['rank']
+            #idx = v['rank']
             lrank = v['last_rank']
             crank = v['rank']
             moved =  lrank - crank
@@ -263,6 +264,7 @@ class league_details:
 
             league_details.ds_df_ld0 = league_details.ds_df_ld0.append(df_temp1)    # append this ROW of data into the DataFrame
             league_details.cl_op_list[v['rank']] = v['entry']    #populate class global dict (this league: rank, player_team_id)
+            idx += 1
 
             # self.cl_op_list[v['rank']] = v['entry']
             # populate class global dict (this league: rank, player_team_id)

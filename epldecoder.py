@@ -7,6 +7,7 @@ import unicodedata
 import logging
 import argparse
 from random import randint
+import pandas as pd
 
 from requests.auth import HTTPBasicAuth
 from requests.auth import HTTPDigestAuth
@@ -170,9 +171,12 @@ def main():
             #fav_league.whose_inmy_league()    # classic league leaderboard
             fav_league.allmy_cl_lboard(this_league)
             #print ( league_details.ds_df_ld0.sort_values(by='GWpoints', ascending=False) )    # only do after fixtures datascience dataframe has been built
-            lx0 =  league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the top ranked player
-            lx1 =  lx0.Total.iloc[0]    # extract the total points of the top ranked player
-            print ( league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] ) )
+            lx0 = league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the TOP #1 ranked player
+            lx1 = lx0.Total.iloc[0]    # extract the total points of the top ranked player
+            lx3 = league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] )
+            lx2 = lx3.sort_values(by='moved', ascending=False)     # sort new DF by MOST improoved
+            lx2 = lx2.reset_index(drop=True)   # reset index becasue we use it in new column asignment
+            print ( lx2.assign(Topmvr=lx2.index+1).sort_values(by='Rank', ascending=True) )    # add new column for TOP mover & resort back to RANK
             print ( "==============================================================" )
         else:
             print ( "ERROR - bad fav league number entered" )
