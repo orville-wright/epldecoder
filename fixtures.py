@@ -217,6 +217,7 @@ class allfixtures:
     def get_standings(self):
         """Create a full current league standings database & make avail in gloabl bootstrap instance"""
         """uses https://www.football-data.org API (my free throttled/limited API account """
+        """Does not output anything. Just refreshes the BOOTSTRAP fixtures dataset."""
 
         connection = http.client.HTTPConnection('api.football-data.org')
         headers = { 'X-Auth-Token': '01232ee1842c428291d3a04091e25916' }              # my private API token (throtteled @ 10 calls/min)

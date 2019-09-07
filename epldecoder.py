@@ -216,12 +216,11 @@ def main():
             df_temp0 = pd.DataFrame.from_dict( ds_data0, orient='index', columns=[ 'Team', 'Cap_name', 'ID', 'Pos', 'GWpts' ] )
             ds_cap_df0 = ds_cap_df0.append(df_temp0)    # append this ROW of data into the DataFrame
         print ( ds_cap_df0.sort_values(by='GWpts', ascending=False) )
-        print ( "==========================================================" )
-        print ( " " )
+        print ( "==========================================================================" )
 
-# This is inaccurate. Its looking at your active live current squad
-# points earned is irrelevant becauset they will be what that player earned in the last game.
-# probably should be showing squad for last game
+# This is inaccurate. Its looking at your active live current squad (i.e. NOT gameweek sensative)
+# points earned is ~ irrelevant becauset it is that each player earned in the last game.
+# probably should be showing squad for a specific gameweek game
     print ( " " )
     print ( "========================== my squad ===========================" )
     print ( "============= Warning: this is your active squad ==============" )
@@ -237,6 +236,7 @@ def main():
         print ( "===== not querying for any player =====" )
         print ( " " )
     else:
+        print ( " " )
         find_me = bootstrap.whois_element(int(query_player))
         print ( "=========== Analysing all opponents squads for 1 player:", find_me, "===========" )
         print ( "Current gameweek:", player_entry.current_event, "- Analyzing gameweek: ", game_week )
