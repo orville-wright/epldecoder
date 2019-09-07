@@ -192,9 +192,11 @@ class priv_playerinfo:
         print ( ")" )
         return int(find_me)    # this players payer_id number
 
-    def capt_anlytx(self):
+    def my_capt_info(self):
         """examine an oponents team and figure out if he has the same captain as you"""
-        logging.info('priv_playerinfo:: capt_anlytx() - Analyzing captain for team %s' % self.playeridnum )
+        """returns 2 values: captain element ID num and name"""
+
+        logging.info('priv_playerinfo.my_capt_info() - Analyzing captain for team %s' % self.playeridnum )
 
         capt_list = []
         #print ("Scanning my squad members:", end="")
@@ -204,11 +206,11 @@ class priv_playerinfo:
             if capt_list['is_captain'] is True:
                 find_me = capt_list['element']
                 player_name = self.bst_inst.whois_element(find_me)
-                print ( "My captain is: (", end="" )
-                print ( capt_list['element'], end="")
-                print ( ") -", player_name )
-                logging.info('priv_playerinfo.capt_anlytx() - quick exit after %s loops' % ca )
-                return    # as soon as you find your captain, exit since there can only be 1
+                #print ( "My captain: (", end="" )
+                #print ( capt_list['element'], end="")
+                #print ( ") -", player_name )
+                logging.info('priv_playerinfo.my_capt_info() - quick exit after %s loops' % ca )
+                return (capt_list['element'], player_name)   # as soon as you find your captain, exit since there can only be 1
 
         return
 

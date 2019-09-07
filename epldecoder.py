@@ -117,7 +117,7 @@ def main():
     password = args['password']
     this_player = args['player']
     this_league = args['league']
-    rleague = args['bool_recleague']
+    rleague = args['bool_recleague']    # Currently DSIABLED. Needs new code
     xray_testing = args['bool_xray']
     query_player = args['query']
     game_week = args['gameweek']
@@ -153,37 +153,74 @@ def main():
         print ( " " )
 
 # show some info & stats about the leaguies that this player is registered in
+# ONLY executes if -l option provided...
     print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-    print ( "======================= All my leagues =======================" )
+    print ( "============================ All my leagues ============================" )
     i_am.my_entry_cleagues()
     print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
 
     if this_league is False:
-        print ( "===============================================================" )
+        print ( "=========================================================================" )
     else:
         #print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
         #print ( "======================= my leagues =======================" )
         fav_league = league_details(this_player, this_league, my_priv_data, bootstrap)    # populate an instance of my classic leagues
         if fav_league.league_exists != 404:
             i_am.my_entry_cleagues()
-            print ( "====================== League leaderbord =====================" )
-            print ( "=======================", fav_league.my_leaguename(), "========================" )
-            #fav_league.whose_inmy_league()    # classic league leaderboard
+            print ( "========================================= League leaderbord ================================================" )
+            print ( "=========================================", fav_league.my_leaguename(), "", end="" )
+            for P in range(65 - len(fav_league.my_leaguename()) ):
+                print ( "=", end="" )
+                # pretty print leaderboard title
+            print ( " " )
             fav_league.allmy_cl_lboard(this_league)
-            #print ( league_details.ds_df_ld0.sort_values(by='GWpoints', ascending=False) )    # only do after fixtures datascience dataframe has been built
+            # only do after fixtures datascience dataframe has been built
             lx0 = league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the TOP #1 ranked player
             lx1 = lx0.Total.iloc[0]    # extract the total points of the top ranked player
-            lx3 = league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] )
-            lx2 = lx3.sort_values(by='moved', ascending=False)     # sort new DF by MOST improoved
-            lx2 = lx2.reset_index(drop=True)   # reset index becasue we use it in new column asignment
-            print ( lx2.assign(Topmvr=lx2.index+1).sort_values(by='Rank', ascending=True) )    # add new column for TOP mover & resort back to RANK
-            print ( "==============================================================" )
+            lx2 = league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] ) # lx3 =
+            lx3 = lx2.sort_values(by='moved', ascending=False)     # sort new DF by MOST improoved     # lx2 = lx3
+            lx3 = lx3.reset_index(drop=True)   # reset index becasue we use it in new column asignment # lx2 = lx2
+            print ( lx3.assign(Topmvr=lx3.index+1).sort_values(by='Rank', ascending=True) )    # add new column for TOP mover & resort back to RANK # lx2
+            print ( "============================================================================================================" )
         else:
-            print ( "ERROR - bad fav league number entered" )
+            print ( "ERROR - Cant build League leaderbord. BAD league number entered!" )
 
+# ONLY executes if -l option provided...otherwise we're NOT intersted in league analytics
+# if YES, then create a leaderbaord for <LEAGUE_ID> with some captain stats
+    if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
+        pass
+    else:
+        print ( " " )
+        #print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
+        print ( "==================== Captain Analytics for gameweek:", game_week, "====================" )
+        print ( "====================", fav_league.my_leaguename(), "", end="" )
+        for P in range(53 - len(fav_league.my_leaguename()) ):
+            print ( "=", end="" )
+            # pretty print leaderboard title
+
+        print ( " " )
+        cid, cn = my_priv_data.my_capt_info()                                 # find MY captain
+        print ( "My captain is:", cid, "-", cn, "..." )
+        ds_cap_df0 = pd.DataFrame(columns=[ 'Team', 'Cap_name', 'ID', 'Pos', 'GWpts' ] )    # shape a new pandas dataframe
+        pe_inst_cache = {}      # global optz cache of all opponent player ENTRY instances
+        opp_team_inst = {}      # global optz cache of all player ENTRY & class instance to full squad dataset
+        for rank, opp_id in league_details.cl_op_list.items():            # class.global var/dict
+            opp_pe_inst = player_entry(opp_id)                            # create instance: player_entry(opp_id)
+            opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create inst of squad (for gw event)
+            opp_team_inst[opp_id] = opp_sq_anlytx                         # build cache : key = playerid, data = full squad instance
+            pe_inst_cache[opp_id] = opp_pe_inst                           # build cache : key = playerid, data = PE instance
+            xx = opp_sq_anlytx.opp_squad_captain()                        # now run some CAPTAIN analytics on current instance (sloppy)
+            #ds_data0 = [[ xx[0], xx[1], xx[2], xx[3], xx[4] ]]    # a fully structured dict returned to us
+            #print ( xx )
+            ds_data0 = { opp_id: xx }    # shapre the pandas dataframe correctly
+            df_temp0 = pd.DataFrame.from_dict( ds_data0, orient='index', columns=[ 'Team', 'Cap_name', 'ID', 'Pos', 'GWpts' ] )
+            ds_cap_df0 = ds_cap_df0.append(df_temp0)    # append this ROW of data into the DataFrame
+        print ( ds_cap_df0.sort_values(by='GWpts', ascending=False) )
+        print ( "==========================================================" )
+        print ( " " )
 
 # This is inaccurate. Its looking at your active live current squad
-# point earned is irrelevant becauset they will be what that player earned in the last game.
+# points earned is irrelevant becauset they will be what that player earned in the last game.
 # probably should be showing squad for last game
     print ( " " )
     print ( "========================== my squad ===========================" )
@@ -192,31 +229,6 @@ def main():
     # print ( priv_playerinfo.ds_df1 )    # only do after fixtures datascience dataframe has been built
     print ( priv_playerinfo.ds_df1.sort_values(by='PtsLG', ascending=False) )    # only do after fixtures datascience dataframe has been built
     print ( "==========================================================" )
-
-# execute  -l option
-# if NO -l <LEAGUE ID> flag, then we're not intersted in league analytics
-# if YES, then create a leaderbaord for <LEAGUE_ID> with some stats
-    if this_league is False:    # only called if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
-        pass
-    else:
-        print ( " " )
-        #print ( "===== League (%s) Captain Analytics for gameweek: (%s) ========" % (this_league, game_week) )
-        print ( "==================== Captain Analytics for gameweek:", game_week, "====================" )
-        print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
-        my_priv_data.capt_anlytx()                                        # find MY captain
-        #for rank,opp_id in fav_league.cl_op_list.items():                    # method local var/dict
-        print ( "Scanning all teams in this league...")
-
-        pe_inst_cache = {}      # global optz cache of all opponent player ENTRY instances
-        opp_team_inst = {}      # global optz cache of all player ENTRY & class instance to full squad dataset
-        for rank, opp_id in league_details.cl_op_list.items():            # class.global var/dict
-            opp_pe_inst = player_entry(opp_id)                            # create instance: player_entry(opp_id)
-            opp_sq_anlytx = get_opponents_squad(opp_id, opp_pe_inst, game_week, my_priv_data, bootstrap)    # create inst of squad (for gw event)
-            opp_team_inst[opp_id] = opp_sq_anlytx                         # build cache : key = playerid, data = full squad instance
-            pe_inst_cache[opp_id] = opp_pe_inst                           # build cache : key = playerid, data = PE instance
-            opp_sq_anlytx.opp_squad_captain()                              # now run some CAPTAIN analytics on current instance (sloppy)
-        print ( "==========================================================" )
-        print ( " " )
 
 # this function scans your squad, looking for a specific <Player_ID>
 # NOTE: only triggered if -l <LEAGUE_ID> provided by user

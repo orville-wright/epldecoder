@@ -115,15 +115,14 @@ class get_opponents_squad:
                 capt_name = self.bst_inst.whois_element(find_me)  # scan main payer data set - each time (!!slow-ish ~600 entities )
                 capt_gw_points = self.bst_inst.element_gw_points(find_me)    # raw points exlcuding bonus/multipliers/deductions
                 # print ( pe_playerid, "(", end="" )
-                print ( "Team:", oppt_tname, end="" )
-                print ( " - Captain:", t7['element'], \
-                        "@ pos:", t7['position'], \
-                        "-", capt_name, end="" )
-                print ( " (gameweek points:", capt_gw_points, end="" )
-                print ( ")" )
-
+                #print ( "Team:", oppt_tname, end="" )
+                #print ( " - Captain:", t7['element'], \
+                #        "@ pos:", t7['position'], \
+                #        "-", capt_name, end="" )
+                #print ( " (gameweek points:", capt_gw_points, end="" )
+                #print ( ")" )
                 logging.info('get_opponents_squad.opp_squad_captain() - found captain - quick exit after %s loops' % player_num )
-                return                                            # exit as soon as captain is located
+                return [oppt_tname, capt_name, t7['element'], t7['position'], capt_gw_points ]   # exit as soon as captain is located
 
         print ( "Failed to locate CAPTAIN in squad", self.t1['entry'], oppt_tname )
         logging.info('get_opponents_squad.opp_squad_captain() - Failed to locate captain with element ID: %s' % find_me )
