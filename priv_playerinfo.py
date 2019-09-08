@@ -127,18 +127,22 @@ class priv_playerinfo:
         logging.info('priv_playerinfo:: list_mysquad() - Analyzing captain for team %s' % self.playeridnum )
         squad = []                            # temp working []
         for sp in range (0, 15):              # note: squad_player hard-coded to 14 players per team
-            self.sp_idx = sp                  # accessor
-            # print ("Squad member:", sp+1, end="")
-            # print ("...", end="" )
+            self.sp_idx = sp                  # accessor : starts @ 0
             squad = self.picks[sp]            # access data heirachery of my squad list of players
             if squad['is_captain'] is True:
                player_type = "Captain"
             elif squad['is_vice_captain'] is True:
-               player_type = "Vice captain"
-#            elif squad['is_sub'] is True:    # seems to have been removed in 2019/2020 season
-#                player_type = "Sub"
+                player_type = "Vice captain"
+            elif sp == 11:                    # [is_sub] element removed in 2019/2020 JSON dataset. This is a fix
+                player_type = "Sub Keeper"    # Sub Keeper
+            elif sp == 12:
+                player_type = "Sub 1"         # 1st priority sub - Regular player
+            elif sp == 13:
+                player_type = "Sub 2"         # 2nd priority sub - Regular player
+            elif sp == 14:
+                player_type = "Sub 3"         # 3rd priority sub - Regular player
             else:
-               player_type = "Regular player"
+                player_type = "Regular player"
 
             find_me = squad['element']
 
