@@ -50,7 +50,7 @@ class allfixtures:
         allfixtures.bootstrap = bootstrapdb
         allfixtures.this_event = self.eventnum
         # create an empty pandas DataFrame with specific column names pre-defined
-        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'] )
+        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'] )
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
@@ -110,44 +110,41 @@ class allfixtures:
         """There is no simple data set / table quickly available."""
         """You have to build/interrogate your list of fixtures every time"""
 
-#       This JSON structure was destroyed in the 2019/2020 season changes.
+        # This JSON structure was destroyed in the 2019/2020 season changes.
         self.datasci = ds_yes_no
         logging.info('allfixtures.upcomming_fixtures() - init : %s' % ds_yes_no )
 
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
-        print ( "Show fixtures for gameweek...", self.eventnum )
         for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
             idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
             idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-# do some analytics on fixtures...
-            print ( "GW:", fixture['event'], fixture['kickoff_time'], "HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
-            # print ( "GW:", fixture['event'], "Day:", fixture['event_day'], "(", fixture['kickoff_time'], ") HOME:", self.epl_team_names[idx_h], "vs.", self.epl_team_names[idx_a], "AWAY" )
-
-            #print ( "Gameplay decison: ", end="" )
+            gametime = fixture['kickoff_time']
+            # do some analytics on fixtures...
             if self.datasci == 1:    # 1 = do deep datascience analytics on fixtures
-                self.game_decisions(idx_h, idx_a)    # run seperately for each game match
+                self.game_decisions(idx_h, idx_a, gametime)    # run seperately for each game match
             else:
                 pass
+                print ( "GW:", fixture['event'], fixture['kickoff_time'], "HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
 
-        #print ( allfixtures.ds_df0.sort_values(by='Rank', ascending=False) )
         return
 
-    def game_decisions(self, team_h, team_a):
+    def game_decisions(self, team_h, team_a, gametime):
         """Datascience control logic for fixtures analytics and decisions"""
 
-        logging.info('allfixtures:: game_decisions() - init ' )
+        logging.info('allfixtures.game_decisions() - init ' )
         self.team_h = team_h
         self.team_a = team_a
+        self.gt = gametime
         self.temp_idx = ""    # temp var populated by return from team_finder()
         #self.get_standings()         # allways make sure league standings is updated/current before we start
 
-        logging.info('allfixtures::game_decisions() - Finding home team - %s' % self.team_h )
+        logging.info('allfixtures.game_decisions() - Finding home team - %s' % self.team_h )
         home = self.team_finder(self.team_h)
-        logging.info('allfixtures::game_decisions() - Home team tuple code - %s' % home )
+        logging.info('allfixtures.game_decisions() - Home team tuple code - %s' % home )
 
-        logging.info('allfixtures::game_decisions() - Finding away team - %s' % self.team_a )
+        logging.info('allfixtures.game_decisions() - Finding away team - %s' % self.team_a )
         away = self.team_finder(self.team_a)
-        logging.info('allfixtures::game_decisions() - Away team tuple code - %s'% away )
+        logging.info('allfixtures.game_decisions() - Away team tuple code - %s'% away )
         ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
         ds_data_away = self.standings_extractor(away)    # ditto
 
@@ -172,10 +169,11 @@ class allfixtures:
 
 # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
         ds_data0 = [[ \
+                    self.gt, \
                     self.team_h, \
                     home_team, \
-                    self.team_a, \
                     away_team, \
+                    self.team_a, \
                     abs(ranking_mismatch), \
                     abs(goal_diff_delta), \
                     abs(gf_delta), \
@@ -183,35 +181,9 @@ class allfixtures:
                     game_weight ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
-                    columns=[ 'Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'], index=[game_tag] )
+                    columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'], index=[game_tag] )
 
         allfixtures.ds_df0 = allfixtures.ds_df0.append(df_temp0)    # append this ROW of data into the DataFrame
-
-        # print ("\tLogic - ", "Pos delta:", abs(ranking_mismatch), "GD delta:", abs(goal_diff_delta), "GF delta:", abs(gf_delta), "GA delta:", ga_delta, "Weighting:", game_weight )
-        # setup pandas dataframe load
-        # print ("\t", "[[", self.team_h, ",", home_team, ",", self.team_a, ",", away_team, ",", abs(ranking_mismatch), ",", abs(goal_diff_delta), ",",  abs(gf_delta), ",", ga_delta, ",", game_weight, "]]" )
-# construct pandas dataframe
-        # print ("\t", \
-        #            "df0 = pd.DataFrame(data_0,", \
-        #            "columns=['Hid', 'Home', 'Aid', 'Away', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'],", \
-        #            "index=[", \
-        #            game_tag, \
-        #            "] )", \
-        #            )
-
-        # print ("\t", \
-        #            "data_0 = [[", \
-        #            self.team_h, ",", \
-        #            home_team, ",", \
-        #            self.team_a, ",", \
-        #            away_team, ",", \
-        #            abs(ranking_mismatch), ",", \
-        #            abs(goal_diff_delta), ",", \
-        #            abs(gf_delta), ",", \
-        #            ga_delta, ",", \
-        #            game_weight, \
-        #            "]]" )
-
         return
 
     def get_standings(self):
