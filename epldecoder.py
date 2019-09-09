@@ -226,7 +226,7 @@ def main():
     print ( "============= Warning: this is your active squad ==============" )
     my_priv_data.list_mysquad()
     # print ( priv_playerinfo.ds_df1 )    # only do after fixtures datascience dataframe has been built
-    print ( priv_playerinfo.ds_df1.sort_values(by='PtsLG', ascending=False) )    # only do after fixtures datascience dataframe has been built
+    print ( priv_playerinfo.ds_df1.sort_values(by='PtsLG', ascending=False) )    # only do after fixtures dataframe has been pre-built
     print ( "==========================================================" )
 
 # this function scans your squad, looking for a specific <Player_ID>
@@ -257,6 +257,14 @@ def main():
     if this_league is False:
         pass
     else:
+        # setup DataFrame
+        # column names = player unique id num
+        col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
+        ds_hm_df0 = pd.DataFrame( columns=col_names )    # shape the HEATMAP dataframe
+        #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
+        # rown index = opponent team names
+        print ( "HACK: colname prep" )
+        print ( col_names )
         print ( " " )
         print ( "=========== Deep squad analytics for my active squad =============" )
         print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
@@ -264,10 +272,10 @@ def main():
             z = 0
             tl = ""
             print ( "Player:", pos, " ", end="" )
-            got_him = my_priv_data.get_oneplayer(pos)
-            for oid, i in opp_team_inst.items():         # cycle through class instances cache for each opponents team
-                if oid != int(i_am.playeridnum):         # skip my team
-                    found_him = i.got_player(got_him)    # does this player exists in this squad
+            got_him = my_priv_data.get_oneplayer(pos)    # cycle trhough all players on MY TEAM
+            for oid, i in opp_team_inst.items():         # cycle through cached class instances of each OPPONENTS team
+                if oid != int(i_am.playeridnum):         # skip *my team* in the cached class instances
+                    found_him = i.got_player(got_him)    # does this player exists in this OPPONENTS squad
                     if found_him == 1:
                         z += 1
                         x = scan_pe_cache(pe_inst_cache, oid)   # pe_inst_cache is a global dict, populated elesewhere !!
