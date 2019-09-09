@@ -255,15 +255,13 @@ def main():
     if this_league is False:
         pass
     else:
+        ds_hm_df5 = pd.DataFrame()
         # setup DataFrame
         # column names = player unique id num
-        col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
-        ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
-        ds_hm_df5 = pd.DataFrame()
+        #col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
+        #ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
         #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
         # rown index = opponent team names
-        print ( "HACK: colname prep" )
-        print ( col_names )
         print ( " " )
         print ( "=========== Deep squad analytics for my active squad =============" )
         print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
@@ -313,8 +311,11 @@ def main():
                 #print ( ds_hm_data0 )
             print ( "+--------------------------------------------------------+" )
             z = 0
+
+        print ( "=====================================================================" )
         hm_tr_data0 = pd.Series( ds_hm_df5.sum(axis=0), name='X-ref TOTALS' )   # setup new ROW = count of COLUMN totals
         ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW of data into the DataFrame as FINAL row
+        # Todo: now also do this for ROW totals !!
         print ( ds_hm_df5 )
 
         #print ( ds_hm_df5 )
