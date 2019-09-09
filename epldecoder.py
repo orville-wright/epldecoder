@@ -195,7 +195,6 @@ def main():
         for P in range(53 - len(fav_league.my_leaguename()) ):
             print ( "=", end="" )
             # pretty print leaderboard title
-
         print ( " " )
         cid, cn = my_priv_data.my_capt_info()                                 # find MY captain
         print ( "My captain is:", cid, "-", cn, "..." )
@@ -227,23 +226,6 @@ def main():
     print ( priv_playerinfo.ds_df1.sort_values(by='PtsLG', ascending=False) )    # only do after fixtures dataframe has been pre-built
     print ( "==========================================================" )
 
-# this function scans your squad, looking for a specific <Player_ID>
-# NOTE: only triggered if -l <LEAGUE_ID> provided by user
-
-    if query_player is False:
-        print ( "===== not querying for any player =====" )
-        print ( " " )
-    else:
-        print ( " " )
-        find_me = bootstrap.whois_element(int(query_player))
-        print ( "=========== Analysing all opponents squads for 1 player:", find_me, "===========" )
-        print ( "Current gameweek:", player_entry.current_event, "- Analyzing gameweek: ", game_week )
-        print ( "Scanning all opponents squads..." )
-        for oppid, inst in opp_team_inst.items():    # cycle through class instances for each opponents team
-            inst.opp_sq_findplayer(query_player)     # very fast. In mem scan. Pre-instantiated from elsewhere
-
-        print ( "==========================================================" )
-
 # Deep analytics of my squad
 # NOTE: only triggered if user asked to analyze a LEAGUE (-l <LEAGUE_ID>)
 #       This makes sense because the user wants deeper league performance stats.
@@ -257,13 +239,17 @@ def main():
     else:
         ds_hm_df5 = pd.DataFrame()
         print ( " " )
-        print ( "=========== Deep squad analytics for my active squad =============" )
-        print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
+        print ( "========================= Deep squad analytics for my active squad ===========================" )
+        print ( "=========================", fav_league.my_leaguename(), "", end="" )
+        for P in range(67 - len(fav_league.my_leaguename()) ):
+            print ( "=", end="" )
+            # pretty print leaderboard title
+        print ( " " )
         for pos in range (0, 15):
             ds_hm_data0 = []
             opp_team_id = []
             opp_team_name = []
-            print ( "Player:", pos+1, " ", end="" )
+            #print ( "Player:", pos+1, " ", end="" )
             got_him = my_priv_data.get_oneplayer(pos)    # cycle trhough all players on MY TEAM - WARNING: prints out some info also
             for oid, i in opp_team_inst.items():         # cycle through cached class instances of each OPPONENTS team
                 if oid != int(i_am.playeridnum):         # skip *my team* in the cached class instances
@@ -283,11 +269,29 @@ def main():
 
             ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup a series as data for COLUM insertion
             ds_hm_df5.insert(loc=0, value=ds_hm_data3, column=got_him )        # inset COLUMN
-        print ( "=====================================================================" )
         hm_tr_data0 = pd.Series( ds_hm_df5.sum(axis=0), name='X-ref TOTALS' )   # setup new ROW = count of COLUMN totals
         ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW into existing DataFrame as FINAL row
         # TODO: now also do counts for ROW totals !!
         print ( ds_hm_df5 )
+        print ( "==============================================================================================" )
+# this function scans ALL of your OPPONENTS squads in a league
+# looking for a specific <Player_ID>
+# and analyzes if that player is present in an OPPONENTS squad
+# NOTE: only triggered if -l <LEAGUE_ID> provided by user
+    if query_player is False:
+        print ( "===== not querying for any player =====" )
+        print ( " " )
+    else:
+        print ( " " )
+        find_me = bootstrap.whois_element(int(query_player))
+        print ( "=========== Analysing all opponents squads for 1 player:", find_me, "===========" )
+        print ( "Current gameweek:", player_entry.current_event, "- Analyzing gameweek: ", game_week )
+        print ( "Scanning all opponents squads..." )
+        for oppid, inst in opp_team_inst.items():    # cycle through class instances for each opponents team
+            inst.opp_sq_findplayer(query_player)     # very fast. In mem scan. Pre-instantiated from elsewhere
+
+        print ( "==========================================================" )
+
 
 # Show the next 10 fixtures
     print ( " " )

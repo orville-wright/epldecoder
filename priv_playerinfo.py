@@ -167,36 +167,42 @@ class priv_playerinfo:
             priv_playerinfo.ds_df1 = priv_playerinfo.ds_df1.append(df_temp1)    # append this ROW of data into the DataFrame
         return
 
-    def get_oneplayer(self, player_num):    # 0...15 are only valid squad member positions
+    def get_oneplayer(self, squad_pos_num):    # 0...15 are only valid squad member positions
         """Pull out of my squad a single player. From a specific squad psotion"""
         """WARNING: This method prints out a bunch of info. Should not do that"""
         """Method should shape a pandas DataFrame and build it as the final output object"""
-        
-        sp = int(player_num)
+
+        sp = int(squad_pos_num)               # the pos # of any player in a squad (0...15)
         squad = []
         squad = self.picks[sp]            # access data heirachery of my squad list of players
         if squad['is_captain'] is True:
            player_type = "Captain"
         elif squad['is_vice_captain'] is True:
            player_type = "Vice captain"
-#        elif squad['is_sub'] is True:
-#            player_type = "Sub"
+        elif sp == 11:                    # [is_sub] element removed in 2019/2020 JSON dataset. This is a fix
+            player_type = "Sub Keeper"    # Sub Keeper
+        elif sp == 12:
+            player_type = "Sub 1"         # 1st priority sub - Regular player
+        elif sp == 13:
+            player_type = "Sub 2"         # 2nd priority sub - Regular player
+        elif sp == 14:
+            player_type = "Sub 3"         # 3rd priority sub - Regular player
         else:
            player_type = "Regular player"
 
         find_me = squad['element']
         player_name = self.bst_inst.whois_element(find_me)            # global handle set once @ start
         self.gw_points = self.bst_inst.element_gw_points(find_me)
-        print ( player_name, "(", end="" )
-        print ( squad['element'], end="" )
-        print ( ")" \
-                # " - @ pos:", squad['position'], \
-                "-", player_type, \
-                # "$:", squad['selling_price']/10, \
-                "- points (", end="" )
-        print ( self.gw_points, end="" )
-        print ( ")" )
-        return int(find_me)    # this players payer_id number
+        #print ( player_name, "(", end="" )
+        #print ( squad['element'], end="" )
+        #print ( ")" \
+        #        # " - @ pos:", squad['position'], \
+        #        "-", player_type, \
+        #        # "$:", squad['selling_price']/10, \
+        #        "- points (", end="" )
+        #print ( self.gw_points, end="" )
+        #print ( ")" )
+        return int(find_me)    # the payer_id number for the player in the squad @ POSition XXX
 
     def my_capt_info(self):
         """examine an oponents team and figure out if he has the same captain as you"""
