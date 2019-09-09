@@ -57,3 +57,40 @@
 
     # pa.drop('Rank', axis=1)    # this works
     #print ( "PANDAS:", pa['Total'].drop('idx', axis=1) )
+
+    #XREF Heat Matrix
+            # setup DataFrame
+            # column names = player unique id num
+            #col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
+            #ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
+            #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
+            # rown index = opponent team names
+
+            #ds_hm_data3 = { got_him: pd.Series(ds_hm_data0, index=team_id) }
+            #hm = { got_him: pd.Series(ds_hm_data0, index=team_id) }
+            #ds_hm_df2 = pd.DataFrame( data=ds_hm_data0, columns=got_him )    # shape the HEATMAP dataframe with preset columns
+            #ds_hm_df5.insert(loc=0, value=ds_hm_data3 )
+            #ds_hm_df1 = ds_hm_df0.insert( loc=0, column=got_him, value=ds_hm_data3 )
+#            if z != 0:
+                #print ( "Found in: ", z, "teams >>", tl)
+#                print ( "Found in: ", tl, z, "teams")
+                #print ( ds_hm_df0 )
+                #print ( ds_hm_data0 )
+#            else:
+#                print ( "Unique - not in any opponents squad" )
+                #print ( ds_hm_df0 )
+                #print ( ds_hm_data0 )
+#            print ( "+--------------------------------------------------------+" )
+#            z = 0
+
+        #print ( ds_hm_df5 )
+        #print ( ds_hm_df5.count() )
+        #print ( ds_hm_df5.sum(axis=0) )
+        #print ( hm_tr_data0 )
+    #hm_tr_data0 = pd.Series( [ds_hm_df5.sum(axis=0)], index='Totals' )          # count up total of each column
+    #df_temp0 = pd.DataFrame(hm_tr_data0, columns=hm_tr_data0.index, index=['Totals'] )
+    # df_temp9 = pd.DataFrame(hm_tr_data0, columns=col_names, index=['Totals'] )
+    #df_temp0 = { hm_tr_data0 }
+    #dfs = pd.Series(df_temp0, index=['Totals'] )
+        #print ( df_temp9 )
+        #print ( hm_tr_data0.index)

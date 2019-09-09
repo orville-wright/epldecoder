@@ -169,7 +169,9 @@ class priv_playerinfo:
 
     def get_oneplayer(self, player_num):    # 0...15 are only valid squad member positions
         """Pull out of my squad a single player. From a specific squad psotion"""
-
+        """WARNING: This method prints out a bunch of info. Should not do that"""
+        """Method should shape a pandas DataFrame and build it as the final output object"""
+        
         sp = int(player_num)
         squad = []
         squad = self.picks[sp]            # access data heirachery of my squad list of players

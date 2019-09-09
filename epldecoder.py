@@ -256,12 +256,6 @@ def main():
         pass
     else:
         ds_hm_df5 = pd.DataFrame()
-        # setup DataFrame
-        # column names = player unique id num
-        #col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
-        #ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
-        #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
-        # rown index = opponent team names
         print ( " " )
         print ( "=========== Deep squad analytics for my active squad =============" )
         print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
@@ -269,68 +263,33 @@ def main():
             ds_hm_data0 = []
             opp_team_id = []
             opp_team_name = []
-            z = 0
-            tl = ""
-            print ( "Player:", pos, " ", end="" )
-            got_him = my_priv_data.get_oneplayer(pos)    # cycle trhough all players on MY TEAM
+            print ( "Player:", pos+1, " ", end="" )
+            got_him = my_priv_data.get_oneplayer(pos)    # cycle trhough all players on MY TEAM - WARNING: prints out some info also
             for oid, i in opp_team_inst.items():         # cycle through cached class instances of each OPPONENTS team
                 if oid != int(i_am.playeridnum):         # skip *my team* in the cached class instances
                     found_him = i.got_player(got_him)    # does this player exists in this OPPONENTS squad
                     if found_him == 1:                   # returns 1 if this player exists in this squad
-                        z += 1
                         x = scan_pe_cache(pe_inst_cache, oid)   # get pe_inst from pre-populated player entry instance cache
                         y = x.my_teamname()
-                        #team_id = x.my_id()
                         opp_team_id.append(x.my_id())
                         opp_team_name.append(x.my_teamname())
-                        tl = tl + y + ", "    # concatinate a string of team names (lazy)
                         ds_hm_data0.append(1)
                     else:
                         ds_hm_data0.append(0)
                         x = scan_pe_cache(pe_inst_cache, oid)   # get pe_inst from pre-populated player entry instance cache
-                        #team_id = x.my_id()
                         opp_team_id.append(x.my_id())
                         opp_team_name.append(x.my_teamname())
                         pass
 
-            ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup series
+            ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup a series as data for COLUM insertion
             ds_hm_df5.insert(loc=0, value=ds_hm_data3, column=got_him )        # inset COLUMN
-            #ds_hm_data3 = { got_him: pd.Series(ds_hm_data0, index=team_id) }
-            #hm = { got_him: pd.Series(ds_hm_data0, index=team_id) }
-            #ds_hm_df2 = pd.DataFrame( data=ds_hm_data0, columns=got_him )    # shape the HEATMAP dataframe with preset columns
-            #ds_hm_df5.insert(loc=0, value=ds_hm_data3 )
-            #ds_hm_df1 = ds_hm_df0.insert( loc=0, column=got_him, value=ds_hm_data3 )
-            if z != 0:
-                #print ( "Found in: ", z, "teams >>", tl)
-                print ( "Found in: ", tl, z, "teams")
-                #print ( ds_hm_df0 )
-                #print ( ds_hm_data0 )
-            else:
-                print ( "Unique - not in any opponents squad" )
-                #print ( ds_hm_df0 )
-                #print ( ds_hm_data0 )
-            print ( "+--------------------------------------------------------+" )
-            z = 0
-
         print ( "=====================================================================" )
         hm_tr_data0 = pd.Series( ds_hm_df5.sum(axis=0), name='X-ref TOTALS' )   # setup new ROW = count of COLUMN totals
-        ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW of data into the DataFrame as FINAL row
-        # Todo: now also do this for ROW totals !!
+        ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW into existing DataFrame as FINAL row
+        # TODO: now also do counts for ROW totals !!
         print ( ds_hm_df5 )
 
-        #print ( ds_hm_df5 )
-        #print ( ds_hm_df5.count() )
-        #print ( ds_hm_df5.sum(axis=0) )
-        #print ( hm_tr_data0 )
-    #hm_tr_data0 = pd.Series( [ds_hm_df5.sum(axis=0)], index='Totals' )          # count up total of each column
-    #df_temp0 = pd.DataFrame(hm_tr_data0, columns=hm_tr_data0.index, index=['Totals'] )
-    # df_temp9 = pd.DataFrame(hm_tr_data0, columns=col_names, index=['Totals'] )
-    #df_temp0 = { hm_tr_data0 }
-    #dfs = pd.Series(df_temp0, index=['Totals'] )
-        #print ( df_temp9 )
-        #print ( hm_tr_data0.index)
-
-# next 10 fixtures
+# Show the next 10 fixtures
     print ( " " )
     next_event = player_entry.current_event + 1
     print ( "==================== Fixture Analytics ====================" )
