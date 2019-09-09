@@ -75,11 +75,9 @@ def scan_pe_cache(pe_cache, pe_key):
     """Will error is pe_cache is not real dict"""
 
     if pe_key in pe_cache:
-        # print ( "Player ENTRY instance found:", pe_cache[pe_key] )
-        return pe_cache[pe_key]
+        return pe_cache[pe_key]    # player entry instance
     else:
-        return 0
-        #print ( "NO Player ENTRY instance present" )
+        return 0    # NO Player ENTRY instance present
     return
 
 ####################### main ###########################
@@ -260,7 +258,7 @@ def main():
         # setup DataFrame
         # column names = player unique id num
         col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
-        ds_hm_df0 = pd.DataFrame( columns=col_names )    # shape the HEATMAP dataframe
+        ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
         #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
         # rown index = opponent team names
         print ( "HACK: colname prep" )
@@ -269,6 +267,7 @@ def main():
         print ( "=========== Deep squad analytics for my active squad =============" )
         print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
         for pos in range (0, 15):
+            ds_hm_data0 = []
             z = 0
             tl = ""
             print ( "Player:", pos, " ", end="" )
@@ -276,22 +275,32 @@ def main():
             for oid, i in opp_team_inst.items():         # cycle through cached class instances of each OPPONENTS team
                 if oid != int(i_am.playeridnum):         # skip *my team* in the cached class instances
                     found_him = i.got_player(got_him)    # does this player exists in this OPPONENTS squad
-                    if found_him == 1:
+                    if found_him == 1:                   # returns 1 if this player exists in this squad
                         z += 1
-                        x = scan_pe_cache(pe_inst_cache, oid)   # pe_inst_cache is a global dict, populated elesewhere !!
+                        x = scan_pe_cache(pe_inst_cache, oid)   # get pe_inst from pre-populated player entry instance cache
                         y = x.my_teamname()
+                        id = x.my_id()
                         tl = tl + y + ", "    # concatinate a string of team names (lazy)
+                        ds_hm_data0.append(id)
                     else:
+                        ds_hm_data0.append("NO")
                         pass
+
+                ds_hm_df2 = pd.DataFrame( data=ds_hm_data0, index=y, columns=got_him )    # shape the HEATMAP dataframe with preset columns
+            ds_hm_df0.insert(loc=0, value=ds_hm_data0, column=got_him )
+            #ds_hm_df1 = ds_hm_df0.insert( loc=0, column=got_him, value=ds_hm_data0 )
             if z != 0:
                 #print ( "Found in: ", z, "teams >>", tl)
                 print ( "Found in: ", tl, z, "teams")
+                #print ( ds_hm_df0 )
+                #print ( ds_hm_data0 )
             else:
                 print ( "Unique - not in any opponents squad" )
-
+                #print ( ds_hm_df0 )
+                #print ( ds_hm_data0 )
             print ( "+--------------------------------------------------------+" )
             z = 0
-
+        print ( ds_hm_df0 )
 # next 10 fixtures
     print ( " " )
     next_event = player_entry.current_event + 1

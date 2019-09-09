@@ -162,13 +162,14 @@ class get_opponents_squad:
         return
 
     def got_player(self, f_playerid):
-        """Scan a players ENTRY and report back some info"""
+        """Scan a players ENTRY instance and cycle trhoug the entire squad"""
+        """checking to see if a specific player exists in this suquad. Report back some info"""
 
         fp_id = int(f_playerid)
         for player_num in range (0, 15):
             t7 = self.t3[player_num]
-            if t7['element'] == fp_id:
-                return 1    # found player in opponents squad
+            if t7['element'] == fp_id:        # found player in opponents squad
+                return 1                      #  YES found, return element dataset
             else:
                 pass        # keep scanning...
 
