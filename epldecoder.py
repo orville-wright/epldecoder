@@ -259,6 +259,7 @@ def main():
         # column names = player unique id num
         col_names = [ (priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True)['Uiqid']).values ]
         ds_hm_df0 = pd.DataFrame({'XXX': ['YES', 'YES', 'YES']} )    # shape the HEATMAP dataframe with preset columns
+        ds_hm_df5 = pd.DataFrame()
         #col_names = [ priv_playerinfo.ds_df1.sort_values(by='Player', ascending=True).values ]
         # rown index = opponent team names
         print ( "HACK: colname prep" )
@@ -268,6 +269,8 @@ def main():
         print ( "=============== league: ", this_league, fav_league.my_leaguename(), "===============" )
         for pos in range (0, 15):
             ds_hm_data0 = []
+            opp_team_id = []
+            opp_team_name = []
             z = 0
             tl = ""
             print ( "Player:", pos, " ", end="" )
@@ -279,16 +282,26 @@ def main():
                         z += 1
                         x = scan_pe_cache(pe_inst_cache, oid)   # get pe_inst from pre-populated player entry instance cache
                         y = x.my_teamname()
-                        id = x.my_id()
+                        #team_id = x.my_id()
+                        opp_team_id.append(x.my_id())
+                        opp_team_name.append(x.my_teamname())
                         tl = tl + y + ", "    # concatinate a string of team names (lazy)
-                        ds_hm_data0.append(id)
+                        ds_hm_data0.append(1)
                     else:
-                        ds_hm_data0.append("NO")
+                        ds_hm_data0.append(0)
+                        x = scan_pe_cache(pe_inst_cache, oid)   # get pe_inst from pre-populated player entry instance cache
+                        #team_id = x.my_id()
+                        opp_team_id.append(x.my_id())
+                        opp_team_name.append(x.my_teamname())
                         pass
 
-                ds_hm_df2 = pd.DataFrame( data=ds_hm_data0, index=y, columns=got_him )    # shape the HEATMAP dataframe with preset columns
-            ds_hm_df0.insert(loc=0, value=ds_hm_data0, column=got_him )
-            #ds_hm_df1 = ds_hm_df0.insert( loc=0, column=got_him, value=ds_hm_data0 )
+            ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup series
+            ds_hm_df5.insert(loc=0, value=ds_hm_data3, column=got_him )        # inset COLUMN
+            #ds_hm_data3 = { got_him: pd.Series(ds_hm_data0, index=team_id) }
+            #hm = { got_him: pd.Series(ds_hm_data0, index=team_id) }
+            #ds_hm_df2 = pd.DataFrame( data=ds_hm_data0, columns=got_him )    # shape the HEATMAP dataframe with preset columns
+            #ds_hm_df5.insert(loc=0, value=ds_hm_data3 )
+            #ds_hm_df1 = ds_hm_df0.insert( loc=0, column=got_him, value=ds_hm_data3 )
             if z != 0:
                 #print ( "Found in: ", z, "teams >>", tl)
                 print ( "Found in: ", tl, z, "teams")
@@ -300,7 +313,22 @@ def main():
                 #print ( ds_hm_data0 )
             print ( "+--------------------------------------------------------+" )
             z = 0
-        print ( ds_hm_df0 )
+        hm_tr_data0 = pd.Series( ds_hm_df5.sum(axis=0), name='X-ref TOTALS' )   # setup new ROW = count of COLUMN totals
+        ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW of data into the DataFrame as FINAL row
+        print ( ds_hm_df5 )
+
+        #print ( ds_hm_df5 )
+        #print ( ds_hm_df5.count() )
+        #print ( ds_hm_df5.sum(axis=0) )
+        #print ( hm_tr_data0 )
+    #hm_tr_data0 = pd.Series( [ds_hm_df5.sum(axis=0)], index='Totals' )          # count up total of each column
+    #df_temp0 = pd.DataFrame(hm_tr_data0, columns=hm_tr_data0.index, index=['Totals'] )
+    # df_temp9 = pd.DataFrame(hm_tr_data0, columns=col_names, index=['Totals'] )
+    #df_temp0 = { hm_tr_data0 }
+    #dfs = pd.Series(df_temp0, index=['Totals'] )
+        #print ( df_temp9 )
+        #print ( hm_tr_data0.index)
+
 # next 10 fixtures
     print ( " " )
     next_event = player_entry.current_event + 1

@@ -75,7 +75,7 @@ class player_entry:
 
         logging.info( 'player_entry:: my_id() - Init method' )
         #print ( self.entry['id'], end="" )
-        return  self.entryid
+        return  self.entry['id']
 
     def my_teamname(self):
         """Get the name of my team"""
