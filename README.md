@@ -1,11 +1,13 @@
+# English Premier League (EPL)
+UK Premiership Fantasy Football game API/Data decoder interface & Analytics platform.
+
+
 # epldecoder
 - (this doc is formatted as Github Markup lang)
+- NOTE: The dataset structures & API of the fantasy football game at https://www.premierleague.com is proprietary and closed. It is not publicly documented and not open to public consumption. No subscription/consumption license is available or offered by https://www.premierleague.com. Subsequently, NO license to those services is provided, inherited or inferred via the use of this code.
 - Updated for 2019/2020 season
    - As usual...during the *2019 off-season*, the Premiership data Architects & Developers changed many components in the internal JSON data structures of the underlying data model. This is normal (since their API & data-model is not public). This breaks API extract operations & code.
    - Current codebase is now aligned to 2019/2020 season.
-
-# English Premier League (EPL)
-UK Fantasy Football website bootstrap API decoder/interface & Data Analytics ML platform.
 
 # Primary use case:
 A companion to EPL Fantasy Football League game, played by 6,000,000+ users worldwide via web app/mobile app at the Barclay's EPL website: http://www.premierleague.com/en-gb.html.
