@@ -156,12 +156,13 @@ def main():
     print ( "============================ All my leagues ============================" )
     i_am.my_entry_cleagues()
     print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
+    print ( "========================================================================" )
 
     if this_league is False:
-        print ( "=========================================================================" )
+        print ( "" )
     else:
         #print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-        #print ( "======================= my leagues =======================" )
+        print ( " " )
         fav_league = league_details(this_player, this_league, my_priv_data, bootstrap)    # populate an instance of my classic leagues
         if fav_league.league_exists != 404:
             i_am.my_entry_cleagues()
@@ -266,14 +267,20 @@ def main():
                         opp_team_id.append(x.my_id())
                         opp_team_name.append(x.my_teamname())
                         pass
-
-            ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup a series as data for COLUM insertion
+            # COLUMN total logic
+            ds_hm_data3 = (pd.Series(ds_hm_data0, index=opp_team_name) )       # setup a series as data for COLUMN insertion
             ds_hm_df5.insert(loc=0, value=ds_hm_data3, column=got_him )        # inset COLUMN
+        # create new ROW of COLUMN totals
         hm_tr_data0 = pd.Series( ds_hm_df5.sum(axis=0), name='X-ref TOTALS' )   # setup new ROW = count of COLUMN totals
         ds_hm_df5 = ds_hm_df5.append(hm_tr_data0)    # append this ROW into existing DataFrame as FINAL row
-        # TODO: now also do counts for ROW totals !!
+        # ROW total logic
+        new_col = pd.DataFrame(ds_hm_df5.sum(axis=1))    # compute ROW totals for ouput as a new COLUMN
+        # create new COLUMN of ROW totals
+        ds_hm_df5 = ds_hm_df5.assign( TOTAL=new_col )    # add new ROW into existing DataFrame
         print ( ds_hm_df5 )
         print ( "==============================================================================================" )
+
+
 # this function scans ALL of your OPPONENTS squads in a league
 # looking for a specific <Player_ID>
 # and analyzes if that player is present in an OPPONENTS squad
