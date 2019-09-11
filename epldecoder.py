@@ -285,6 +285,9 @@ def main():
 # looking for a specific <Player_ID>
 # and analyzes if that player is present in an OPPONENTS squad
 # NOTE: only triggered if -l <LEAGUE_ID> provided by user
+    print ( " " )
+    print ( " " )
+    print ( " " )
     if query_player is False:
         print ( "===== not querying for any player =====" )
         print ( " " )
