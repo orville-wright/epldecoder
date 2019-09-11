@@ -179,7 +179,10 @@ class allfixtures:
         # 28.7% of games won by the away team
         # 22.1% of games ended in a draw
         #
-        # NOTE 3: To calculate a home advantage for a team...
+        # NOTE 3: On average, since 1992/93...
+        # the home team scores around 1.53 goals compared to 1.12 for the away team.
+        #
+        # NOTE 4: To calculate a home advantage for a team...
         # Home advantage = (home goals scored - goals conceded at home) / number of home games played in the season
 
         ranking_mismatch = ds_data_home[2] - ds_data_away[2]
