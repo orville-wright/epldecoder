@@ -50,7 +50,7 @@ class allfixtures:
         allfixtures.bootstrap = bootstrapdb
         allfixtures.this_event = self.eventnum
         # create an empty pandas DataFrame with specific column names pre-defined
-        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'] )
+        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'RankD', 'GDd', 'GFd', 'GAd', 'Hwin', 'Awin', 'Weight'] )
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
@@ -108,7 +108,7 @@ class allfixtures:
     def upcomming_fixtures(self, ds_yes_no):
         """Fixtures are messy in the main JSON data model"""
         """There is no simple data set / table quickly available."""
-        """You have to build/interrogate your list of fixtures every time"""
+        """You have to interrogate & build your list of fixtures every time"""
 
         # This JSON structure was destroyed in the 2019/2020 season changes.
         self.datasci = ds_yes_no
@@ -116,24 +116,30 @@ class allfixtures:
 
         tn_idx = self.bootstrap.list_epl_teams()    # build my nice helper team id/real name dict
         for fixture in self.fixtures:         # BROKEN by 2019/2020 JSON changes
-            idx_h = int(fixture['team_h'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
-            idx_a = int(fixture['team_a'])    # use INT to index into the team-name dict self.t that was populated in list_epl_teams()
+            idx_h = int(fixture['team_h'])    # get INT num of HOME team to use as search key for this teams real team-name
+            idx_a = int(fixture['team_a'])    # get INT num of AWAY team to use as search key for this teams real team-name
+            h_dif = int(fixture['team_h_difficulty'])    # get INT for difficulty factor for HOME team to win this game
+            a_dif = int(fixture['team_a_difficulty'])    # get INT for difficulty factor for AWAY team to win this game
             gametime = fixture['kickoff_time']
             # do some analytics on fixtures...
             if self.datasci == 1:    # 1 = do deep datascience analytics on fixtures
-                self.game_decisions(idx_h, idx_a, gametime)    # run seperately for each game match
+                self.game_decisions(idx_h, idx_a, h_dif, a_dif, gametime)    # run seperately for each individual game fixture/match
             else:
                 pass
                 print ( "GW:", fixture['event'], fixture['kickoff_time'], "HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
 
         return
 
-    def game_decisions(self, team_h, team_a, gametime):
-        """Datascience control logic for fixtures analytics and decisions"""
+    def game_decisions(self, team_h, team_a, h_dif, a_dif, gametime):
+        """Datascience logic for fixtures analytics and decisions"""
+        """Build out a Pandas DataFrame table to formulate a decision on"""
+        """which games are good to play, highest probability of big scores, etc"""
 
         logging.info('allfixtures.game_decisions() - init ' )
         self.team_h = team_h
         self.team_a = team_a
+        self.h_dif = h_dif
+        self.a_dif = a_dif
         self.gt = gametime
         self.temp_idx = ""    # temp var populated by return from team_finder()
         #self.get_standings()         # allways make sure league standings is updated/current before we start
@@ -148,8 +154,34 @@ class allfixtures:
         ds_data_home = self.standings_extractor(home)    # uses football-data.org team ID
         ds_data_away = self.standings_extractor(away)    # ditto
 
-        # team standings dataset
-        # teamid, team_full_name, ranking_pos, gf, ga, gd)
+        # team standings pandas DataFrame column layout
+        # [ index, gametime, home_ID, home_name, away_name, away_id, table_rank_missmatch
+        # goal_dif, goal_for_diff, goal_against_diff, home_win_prob, away_win_prob, calculated_weighting_rank ]
+
+        # Each teams difficulty factor for winning this game.
+        # NOTE: Raw numbers are set by the league for each game pairing. I am uniquely calculating the probability factor
+        # <1 means easier to win, >1 means difficult to win, 1 = 50-50 even chance
+        #h_win_prob = round( abs(h_dif / a_dif),2 )
+        #a_win_prob = round( abs(a_dif / h_dif),2 )
+        h_win_prob = round( abs(a_dif / h_dif),2 )
+        a_win_prob = round( abs(h_dif / a_dif),2 )
+        #
+        # STATISTICAL model
+        # NOTE 1: On average, over the past 131 YEARS...Premier League teams consistently...
+        # win around 46.2% of home games
+        # draw 27.52% of the time
+        # and the away team are victorious in 26.32% of games
+        #
+        # NOTE 2: statistical snapshot of the 2016/17 Premier League season...
+        # 607 home goals
+        # 457 away goals
+        # 49.2% of games won by the home team
+        # 28.7% of games won by the away team
+        # 22.1% of games ended in a draw
+        #
+        # NOTE 3: To calculate a home advantage for a team...
+        # Home advantage = (home goals scored - goals conceded at home) / number of home games played in the season
+
         ranking_mismatch = ds_data_home[2] - ds_data_away[2]
         goal_diff_delta = abs(ds_data_home[5] - ds_data_away[5])
         gf_delta = ds_data_home[3] - ds_data_away[3]
@@ -178,10 +210,16 @@ class allfixtures:
                     abs(goal_diff_delta), \
                     abs(gf_delta), \
                     ga_delta, \
+                    h_win_prob, \
+                    a_win_prob, \
                     game_weight ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
-                    columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'POSid', 'GDd', 'GFd', 'GAd', 'Rank'], index=[game_tag] )
+                    columns=[ \
+                    'Time', 'Hid', 'Home', 'Away', 'Aid', \
+                    'RankD', 'GDd', 'GFd', 'GAd', 'Hwin', \
+                    'Awin', 'Weight'], \
+                    index=[game_tag] )
 
         allfixtures.ds_df0 = allfixtures.ds_df0.append(df_temp0)    # append this ROW of data into the DataFrame
         return

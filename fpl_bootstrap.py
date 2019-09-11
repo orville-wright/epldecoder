@@ -204,8 +204,8 @@ class fpl_bootstrap:
         return
 
     def list_epl_teams(self):
-        """BUILD a small private class helper dict that holds epl team ID and real names"""
-        """this dict is accessible via the base class fpl_bootstrap"""
+        """BUILD a small private class helper accessor dict that holds epl team ID and real team names"""
+        """This dict is accessible via the base class fpl_bootstrap"""
 
         # this method makes sense to belong to BOOTSTRAP class
         logging.info('fpl_bootstrap:: list_epl_teams() - init' )    # setup a dict of team IDs + NAMES for easy reference
