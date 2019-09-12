@@ -180,11 +180,15 @@ class allfixtures:
             h_win = True
             a_win = False
             # create N instances of fixtures class
+            # NOTE: I should only do this looop ONCE, becasue it captures ALL data !!
+            # whcih means, I need to move it to its own class method and selectively call
             for f in range( 1, int(self.eventnum) ):
-                allfixtures(self.playeridnum, allfixtures.bootstrap, f)
-            	print ( "Fix:", f, "...", end="" )
+                # all_fix = {}
+                # f_loop_inst = allfixtures(self.playeridnum, allfixtures.bootstrap, f )
+                # all_fix.append = ( f:, f_loop_inst )
+                print ( "Fix:", f, "...", end="" )
 
-        print ( " ")
+            print ( " " )
             # ! now calculate Home_Game_Advantage
             # ! cycle through all previous home games for this team, extracting 3 key data-points...
             # ! 1. home goals scored
@@ -274,7 +278,7 @@ class allfixtures:
         self.se_ts = ts    # team I am intersted in
         logging.info('allfixtures::standings_extractor() - init %s' % self.se_ts )
         standings = []
-        standings = self.bootstrap.standings_t       # load latest league standings
+        standings = self.bootstrap.standings_t       # BUG - assumes current week - FIX load latest league standings
         standings_table = standings['table']    # a single JSON []array with all 20 teams
         for pos in range (0, 20):
             stp = standings_table[pos]          # array indexed by INT numerical section (0...20), not a named key
