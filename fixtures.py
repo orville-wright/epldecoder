@@ -176,9 +176,21 @@ class allfixtures:
             h_win = False
             a_win = False
 
-        if h_win_prob > a_win_prob:    # Home team has advantage
+        if h_win_prob > a_win_prob:    # Home team has an advantage
             h_win = True
             a_win = False
+            # create N instances of fixtures class
+            for f in range( 1, int(self.eventnum) ):
+                allfixtures(self.playeridnum, allfixtures.bootstrap, f)
+            	print ( "Fix:", f, "...", end="" )
+
+        print ( " ")
+            # ! now calculate Home_Game_Advantage
+            # ! cycle through all previous home games for this team, extracting 3 key data-points...
+            # ! 1. home goals scored
+            # ! 2. home goals conceeded
+            # ! 3. total number of home games
+            # ! NOTE: this will require a network API I/O for each game week (i.e. slow)
 
         if a_win_prob > h_win_prob:    # Away team had advantage
             h_win = False
