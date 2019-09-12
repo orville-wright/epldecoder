@@ -50,7 +50,9 @@ class allfixtures:
         allfixtures.bootstrap = bootstrapdb
         allfixtures.this_event = self.eventnum
         # create an empty pandas DataFrame with specific column names pre-defined
-        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'RankD', 'GDd', 'GFd', 'GAd', 'Hwin', 'Awin', 'Weight'] )
+        allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'RankD', 'GDd', \
+                                                  'GFd', 'GAd', 'Hwin', 'Awin',  'Hadv', 'Weight'] )
+
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
         API_URL0 = 'https://fantasy.premierleague.com/a/login'
@@ -165,25 +167,23 @@ class allfixtures:
         #a_win_prob = round( abs(a_dif / h_dif),2 )
         h_win_prob = round( abs(a_dif / h_dif),2 )
         a_win_prob = round( abs(h_dif / a_dif),2 )
+        h_win = False
+        a_win = False
         #
-        # STATISTICAL model
-        # NOTE 1: On average, over the past 131 YEARS...Premier League teams consistently...
-        # win around 46.2% of home games
-        # draw 27.52% of the time
-        # and the away team are victorious in 26.32% of games
-        #
-        # NOTE 2: statistical snapshot of the 2016/17 Premier League season...
-        # 607 home goals
-        # 457 away goals
-        # 49.2% of games won by the home team
-        # 28.7% of games won by the away team
-        # 22.1% of games ended in a draw
-        #
-        # NOTE 3: On average, since 1992/93...
-        # the home team scores around 1.53 goals compared to 1.12 for the away team.
-        #
-        # NOTE 4: To calculate a home advantage for a team...
-        # Home advantage = (home goals scored - goals conceded at home) / number of home games played in the season
+        # STATISTICAL model underpinning the decision making process...
+        # see epldecoder WIKI.
+        if h_win_prob % a_win_prob == 1:    # 50-50 equal dificulty level
+            h_win = False
+            a_win = False
+
+        if h_win_prob > a_win_prob:    # Home team has advantage
+            h_win = True
+            a_win = False
+
+        if a_win_prob > h_win_prob:    # Away team had advantage
+            h_win = False
+            a_win = True
+
 
         ranking_mismatch = ds_data_home[2] - ds_data_away[2]
         goal_diff_delta = abs(ds_data_home[5] - ds_data_away[5])
@@ -215,13 +215,14 @@ class allfixtures:
                     ga_delta, \
                     h_win_prob, \
                     a_win_prob, \
+                    h_win, \
                     game_weight ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
                     columns=[ \
                     'Time', 'Hid', 'Home', 'Away', 'Aid', \
                     'RankD', 'GDd', 'GFd', 'GAd', 'Hwin', \
-                    'Awin', 'Weight'], \
+                    'Awin', 'Hadv', 'Weight'], \
                     index=[game_tag] )
 
         allfixtures.ds_df0 = allfixtures.ds_df0.append(df_temp0)    # append this ROW of data into the DataFrame
