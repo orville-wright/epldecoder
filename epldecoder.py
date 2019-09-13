@@ -306,8 +306,8 @@ def main():
 # Show the next 10 fixtures
     print ( " " )
     next_event = player_entry.current_event + 1
-    print ( "==================== Fixture Analytics ====================" )
-    print ( "==================== Gameweek:", next_event, "====================" )
+    print ( "======================================== Fixture Analytics & statistical modeling =========================================" )
+    print ( "======================================== Gameweek:", next_event, "======================================================================" )
     these_fixtures = allfixtures(i_am.playeridnum, bootstrap, next_event )
     these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
     these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES datascience anqalytics for fixtures

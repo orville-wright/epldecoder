@@ -212,9 +212,9 @@ class allfixtures:
         game_tag = str(self.team_h) + '_' + str(self.team_a)
 
         if self.hga > 0:
-            ptg = ( game_weight * self.hga ) + ( h_win_prob * ranking_mismatch )
+            ptg = ( game_weight * self.hga ) + (( h_win_prob * ranking_mismatch ) * 10 )
         else:
-            ptg = game_weight + ( h_win_prob * ranking_mismatch )
+            ptg = game_weight + (( h_win_prob * ranking_mismatch ) * 10 )
 
 # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
         ds_data0 = [[ \
@@ -232,7 +232,7 @@ class allfixtures:
                     h_win, \
                     self.hga, \
                     game_weight, \
-                    ptg ]]
+                    abs(ptg) ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
                     columns=[ \
