@@ -51,7 +51,7 @@ class allfixtures:
         allfixtures.this_event = self.eventnum
         # create an empty pandas DataFrame with specific column names pre-defined
         allfixtures.ds_df0 = pd.DataFrame(columns=[ 'Time', 'Hid', 'Home', 'Away', 'Aid', 'RankD', 'GDd', \
-                                                  'GFd', 'GAd', 'Hwin', 'Awin',  'Hadv', 'Weight'] )
+                                                  'GFd', 'GAd', 'Hwin', 'Awin', 'HomeA', 'HGA', 'Weight', 'PlayME'] )
 
         s = requests.Session()
         user_agent = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0'}
@@ -93,16 +93,6 @@ class allfixtures:
             # note: entry[] and player[] are not auto loaded when dataset lands (not sure why)
             t0 = json.loads(rx1.text)
             self.fixtures = t0    # entire JSON dict - process current event (could be past/present/future)
-            #for XX in range (0..9):
-
-            #print ("JSON ARRAY DUMP:", t0[0] )
-            #print ("ALL FIXTURES FOR CURRENT WEEK NUM:", t0)
-            #self.game_settings = t0['game_settings']
-            #self.phases = t0['phases']
-            #self.teams = t0['teams']                    # All details of EPL teams in Premieership league this year
-            #self.elements = t0['elements']              # big data-set for every EPL squad player full details/stats
-            #self.stats = t0['element_stats']              # big data-set for every EPL squad player full details/stats
-            #self.element_types = t0['element_types']
         return
 
 #######################
@@ -128,7 +118,9 @@ class allfixtures:
                 self.game_decisions(idx_h, idx_a, h_dif, a_dif, gametime)    # run seperately for each individual game fixture/match
             else:
                 pass
-                print ( "GW:", fixture['event'], fixture['kickoff_time'], "HOME:", self.bootstrap.epl_team_names[idx_h], "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
+                print ( "GW:", fixture['event'], fixture['kickoff_time'], \
+                        "HOME:", self.bootstrap.epl_team_names[idx_h], \
+                        "vs.", self.bootstrap.epl_team_names[idx_a], "(AWAY)" )
 
         return
 
@@ -143,6 +135,11 @@ class allfixtures:
         self.h_dif = h_dif
         self.a_dif = a_dif
         self.gt = gametime
+        self.hga = 1
+        self.hgs = 1
+        self.hgc = 1
+        self.hgp = 1
+        self.hga_teamname = "Team name missing"
         self.temp_idx = ""    # temp var populated by return from team_finder()
         #self.get_standings()         # allways make sure league standings is updated/current before we start
 
@@ -170,36 +167,32 @@ class allfixtures:
         h_win = False
         a_win = False
         #
+        # Compute Home Game Advantage
         # STATISTICAL model underpinning the decision making process...
         # see epldecoder WIKI.
-        if h_win_prob % a_win_prob == 1:    # 50-50 equal dificulty level
+
+        if h_win_prob == a_win_prob:    # 50-50 equal dificulty level
             h_win = False
             a_win = False
+            self.hga = 0
 
         if h_win_prob > a_win_prob:    # Home team has an advantage
             h_win = True
             a_win = False
-            # create N instances of fixtures class
-            # NOTE: I should only do this looop ONCE, becasue it captures ALL data !!
-            # whcih means, I need to move it to its own class method and selectively call
-            for f in range( 1, int(self.eventnum) ):
-                # all_fix = {}
-                # f_loop_inst = allfixtures(self.playeridnum, allfixtures.bootstrap, f )
-                # all_fix.append = ( f:, f_loop_inst )
-                print ( "Fix:", f, "...", end="" )
+            t, h, a = self.get_standings()    # get latest standings & game stats. ONLY h is used here!
+            for s in range(0, 20):    # scan 20 teams
+                if h[s]['team']['id'] == home:    # looking for team id
+                    self.htn = h[s]['team']['name']
+                    self.hgs = h[s]['goalsFor']
+                    self.hgc = h[s]['goalsAgainst']
+                    self.hgp = h[s]['playedGames']
 
-            print ( " " )
-            # ! now calculate Home_Game_Advantage
-            # ! cycle through all previous home games for this team, extracting 3 key data-points...
-            # ! 1. home goals scored
-            # ! 2. home goals conceeded
-            # ! 3. total number of home games
-            # ! NOTE: this will require a network API I/O for each game week (i.e. slow)
+            self.hga = (self.hgs - self.hgc) / self.hgp
 
-        if a_win_prob > h_win_prob:    # Away team had advantage
+        if a_win_prob > h_win_prob:    # Away team has` advantage
             h_win = False
             a_win = True
-
+            self.hga = 0
 
         ranking_mismatch = ds_data_home[2] - ds_data_away[2]
         goal_diff_delta = abs(ds_data_home[5] - ds_data_away[5])
@@ -218,6 +211,11 @@ class allfixtures:
         #game_tag = "'" + str(self.team_h) + '_vs_' + str(self.team_a) + "'"
         game_tag = str(self.team_h) + '_' + str(self.team_a)
 
+        if self.hga > 0:
+            ptg = ( game_weight * self.hga ) + ( h_win_prob * ranking_mismatch )
+        else:
+            ptg = game_weight + ( h_win_prob * ranking_mismatch )
+
 # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
         ds_data0 = [[ \
                     self.gt, \
@@ -232,13 +230,15 @@ class allfixtures:
                     h_win_prob, \
                     a_win_prob, \
                     h_win, \
-                    game_weight ]]
+                    self.hga, \
+                    game_weight, \
+                    ptg ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
                     columns=[ \
                     'Time', 'Hid', 'Home', 'Away', 'Aid', \
                     'RankD', 'GDd', 'GFd', 'GAd', 'Hwin', \
-                    'Awin', 'Hadv', 'Weight'], \
+                    'Awin', 'HomeA', 'HGA', 'Weight', 'PlayME' ], \
                     index=[game_tag] )
 
         allfixtures.ds_df0 = allfixtures.ds_df0.append(df_temp0)    # append this ROW of data into the DataFrame
@@ -267,9 +267,10 @@ class allfixtures:
         self.standings_a_table = self.regular_season_a['table']    # data
 
         self.bootstrap.standings_t = self.regular_season_t    # save standings dict as class gloabl accessor
-        # print ("GET_STANDINGS:", self.standings_t_table )          # JSON dataset
-        #print ("REGULAR_SEASON:", self.regular_season_t )
-        return
+        #print ("TOTALS:", self.standings_t_table )          # JSON dataset
+        #print ("HOME_TOTALS:", json.dumps(self.regular_season_h, indent=2, sort_keys=True) )
+        #print ("AWAY_TOTALS:", self.regular_season_a )
+        return (self.standings_t_table, self.standings_h_table, self.standings_a_table)
 
     def standings_extractor(self, ts):
         """method to extract the standings details for ONE specific team"""
@@ -309,9 +310,8 @@ class allfixtures:
         return ds_data    # tuple containg data science ready data
 
     def team_finder(self, tf):
-        """Helper moethod to decode & xref team ID's across multile API's"""
-        """across multiple API web services"""
-        """call : method with fantas.epl TEAM ID"""
+        """Helper moethod to decode & xref team ID's across multile API's & data services"""
+        """call : method with fantasy.epl TEAM ID"""
         """Returns : football-data.org TEAM ID"""
 
         # we now utilize mukltiple API's as data sources & those API's do *NOT* use a
