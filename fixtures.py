@@ -160,8 +160,6 @@ class allfixtures:
         # Each teams difficulty factor for winning this game.
         # NOTE: Raw numbers are set by the league for each game pairing. I am uniquely calculating the probability factor
         # <1 means easier to win, >1 means difficult to win, 1 = 50-50 even chance
-        #h_win_prob = round( abs(h_dif / a_dif),2 )
-        #a_win_prob = round( abs(a_dif / h_dif),2 )
         h_win_prob = round( abs(a_dif / h_dif),2 )
         a_win_prob = round( abs(h_dif / a_dif),2 )
         h_win = False
@@ -212,9 +210,9 @@ class allfixtures:
         game_tag = str(self.team_h) + '_' + str(self.team_a)
 
         if self.hga > 0:
-            ptg = ( game_weight * self.hga ) + (( h_win_prob * ranking_mismatch ) * 10 )
+            playme = ( game_weight * self.hga ) + (( h_win_prob * ranking_mismatch ) * 10 )
         else:
-            ptg = game_weight + (( h_win_prob * ranking_mismatch ) * 10 )
+            playme = game_weight + (( h_win_prob * ranking_mismatch ) * 10 )
 
 # note: Pandas DataFrame = allfixtures.ds_df0 - allready pre-initalized as EMPYT on __init__
         ds_data0 = [[ \
@@ -232,7 +230,7 @@ class allfixtures:
                     h_win, \
                     self.hga, \
                     game_weight, \
-                    abs(ptg) ]]
+                    abs(playme) ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
                     columns=[ \
