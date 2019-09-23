@@ -37,6 +37,7 @@ class player_entry:
         player_entry.owner_player_id = self.playeridnum
         logging.info('player_entry:: - init class instance as player: %s' % self.playeridnum )
         player_entry.ds_df_pe0 = pd.DataFrame(columns=[ 'Index', 'League_name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ] )
+
         EXTRACT_URL = FPL_API_URL + ENTRY + self.playeridnum + '/'
 
         s = requests.Session()
@@ -109,6 +110,8 @@ class player_entry:
             lrank = v['entry_last_rank']
             crank = v['entry_rank']
             moved =  lrank - crank
+            # TODO: add %moved here. (need ot extract total num of players in tis leage 1st)
+
             if moved == 0:
                 levelup = "="
             elif lrank > crank:
@@ -122,7 +125,8 @@ class player_entry:
                         v['id'], \
                         v['entry_rank'], \
                         v['entry_last_rank'],
-                        moved, levelup ]]
+                        moved, \
+                        levelup ]]
 
             df_temp0 = pd.DataFrame(ds_data0, \
                         columns=[ 'Index', 'League_name', 'Lid', 'Crank', 'Lrank', 'Moved', 'levelup' ], index=[p] )

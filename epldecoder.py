@@ -153,10 +153,10 @@ def main():
 # show some info & stats about the leaguies that this player is registered in
 # ONLY executes if -l option provided...
     print (i_am.entry['name'], "plays in", len(i_am.cleagues), "leagues" )
-    print ( "============================ All my leagues ============================" )
+    print ( "================================ All my leagues ================================" )
     i_am.my_entry_cleagues()
     print ( player_entry.ds_df_pe0.sort_values(by='Index', ascending=False) )    # only do after fixtures datascience dataframe has been built
-    print ( "========================================================================" )
+    print ( "================================================================================" )
 
     if this_league is False:
         print ( "" )
@@ -174,12 +174,12 @@ def main():
             print ( " " )
             fav_league.allmy_cl_lboard(this_league)
             # only do after fixtures datascience dataframe has been built
-            lx0 = league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the TOP #1 ranked player
-            lx1 = lx0.Total.iloc[0]    # extract the total points of the top ranked player
-            lx2 = league_details.ds_df_ld0.assign(Pts_behind=lx1 - league_details.ds_df_ld0['Total'] ) # lx3 =
-            lx3 = lx2.sort_values(by='moved', ascending=False)     # sort new DF by MOST improoved     # lx2 = lx3
-            lx3 = lx3.reset_index(drop=True)   # reset index becasue we use it in new column asignment # lx2 = lx2
-            print ( lx3.assign(Topmvr=lx3.index+1).sort_values(by='Rank', ascending=True) )    # add new column for TOP mover & resort back to RANK # lx2
+            l_0 = league_details.ds_df_ld0[(league_details.ds_df_ld0['Rank'] == 1) ]     # select the TOP #1 ranked player
+            l_1 = l_0.Total.iloc[0]    # extract the total points of the top ranked player
+            l_2 = league_details.ds_df_ld0.assign(Pts_behind=l_1 - league_details.ds_df_ld0['Total'] ) # lx3 =
+            l_3 = l_2.sort_values(by='moved', ascending=False)     # sort new DF by MOST improoved     # lx2 = lx3
+            l_3 = l_3.reset_index(drop=True)   # reset index becasue we use it in new column asignment # lx2 = lx2
+            print ( l_3.assign(Topmvr=l_3.index+1).sort_values(by='Rank', ascending=True) )    # add new column for TOP mover & resort back to RANK # lx2
             print ( "============================================================================================================" )
         else:
             print ( "ERROR - Cant build League leaderbord. BAD league number entered!" )
@@ -303,10 +303,20 @@ def main():
 
 
 # Show the next 10 fixtures
+# First show the CURRENT event, and then the NEXT upcomming event.
+    print ( " " )
+    print ( "======================================== Fixture Analytics & statistical modeling ============================================" )
+    print ( "======================================== Current Gameweek:", player_entry.current_event, "*", "================================================================" )
+    these_fixtures = allfixtures(i_am.playeridnum, bootstrap, player_entry.current_event )
+    these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
+    these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES datascience anqalytics for fixtures
+    print ( allfixtures.ds_df0.sort_values(by='PlayME', ascending=False) )    # only do after fixtures datascience dataframe has been built
+    print ( " " )
+
     print ( " " )
     next_event = player_entry.current_event + 1
     print ( "======================================== Fixture Analytics & statistical modeling =========================================" )
-    print ( "======================================== Gameweek:", next_event, "======================================================================" )
+    print ( "======================================== Upcomming Gameweek:", next_event, "============================================================" )
     these_fixtures = allfixtures(i_am.playeridnum, bootstrap, next_event )
     these_fixtures.get_standings()        # no output - update latest dataset - standings/ranking. Should do this early, or things will fail
     these_fixtures.upcomming_fixtures(1)    # 0 = NO, 1 = YES datascience anqalytics for fixtures

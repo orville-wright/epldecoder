@@ -98,7 +98,7 @@ class allfixtures:
 #######################
 
     def upcomming_fixtures(self, ds_yes_no):
-        """Fixtures are messy in the main JSON data model"""
+        """Extract fixture from sucessful API get - Fixtures are messy in the main JSON data model"""
         """There is no simple data set / table quickly available."""
         """You have to interrogate & build your list of fixtures every time"""
 
@@ -126,7 +126,7 @@ class allfixtures:
 
     def game_decisions(self, team_h, team_a, h_dif, a_dif, gametime):
         """Datascience logic for fixtures analytics and decisions"""
-        """Build out a Pandas DataFrame table to formulate a decision on"""
+        """Build out a Pandas DataFrame to formulate a decision on"""
         """which games are good to play, highest probability of big scores, etc"""
 
         logging.info('allfixtures.game_decisions() - init ' )
@@ -228,9 +228,9 @@ class allfixtures:
                     h_win_prob, \
                     a_win_prob, \
                     h_win, \
-                    self.hga, \
+                    round(self.hga, 2), \
                     game_weight, \
-                    abs(playme) ]]
+                    abs( round(playme, 1) ) ]]
 
         df_temp0 = pd.DataFrame(ds_data0, \
                     columns=[ \
@@ -314,14 +314,15 @@ class allfixtures:
 
         # we now utilize mukltiple API's as data sources & those API's do *NOT* use a
         # standardized ID_number for each team. - (must be updated @ start of each season.
-        # 0 = www://football-data.org TEAM ID code - (immutable for ever)
-        # 1 = www://fantasy.premierleague.com TEAM ID code - (immutable for ever)
-        # 2 = www://fantasy.premierleague.com  TEAM ID index for this season (changes every season)
+        # 0 = www://football-data.org TEAM ID code - (code never changes)
+        # 1 = www://fantasy.premierleague.com TEAM ID code - (code never changes)
+        # 2 = www://fantasy.premierleague.com  TEAM ID index INT for this season (changes every season)
 
-        # WARNING: fantasy.EPL doesnt use teamID much. it uses team index (which is int(index) in its JSON )
-        # tuple: very fast but immutable : foorball-data.com-teamID, epl-teamid, bootstrap-teamid
+        # WARNING: fantasy.EPL doesnt use teamID much. it uses team index in its JSON data sets)
+        # tuple: very fast but immutable
         #
-        # table delow is only relevent for 2019/2020 season
+        # table struct is only relevent for 2019/2020 season - teams in leage change every year
+        # TODO: should make this a flat data file & load it in, so its easily updatable each season.
         self.teamid_xlt = ( \
                         57, 3, 1, \
                         58, 7, 2, \
